@@ -1,0 +1,301 @@
+// ASAS FOR EDUCATION - Database Schema
+// This is your Prisma schema file
+
+generator client {
+  provider = "prisma-client-js"
+  output   = "../app/generated/prisma"
+}
+
+datasource db {
+  provider = "postgresql"
+}
+
+// ==========================================
+// 1. USERS & AUTHENTICATION
+// ==========================================
+
+enum UserRole {
+  ADMIN
+  APPLICATION
+  CONSULTANT
+  SUB_AGENT
+}
+
+model User {
+  id        String   @id @default(cuid())
+  email     String   @unique
+  password  String
+  firstName String
+  lastName  String
+  role      UserRole
+  phone     String?
+  avatar    String?
+  isActive  Boolean  @default(true)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  // Relations
+  assignedLeads Lead[]    @relation("ConsultantLeads")
+  students      Student[] @relation("ConsultantStudents")
+  announcements Announcement[]
+  blogPosts     Blog[]
+
+  @@map("users")
+}
+
+// ==========================================
+// 2. LEADS (from website forms)
+// ==========================================
+
+enum LeadStatus {
+  NEW
+  QUALIFYING
+  QUALIFIED
+  APPOINTMENT
+  DEAL
+}
+
+enum LeadSource {
+  HOME_PAGE
+  CATALOGUE
+  DESTINATION
+  UNIVERSITY
+  BLOG
+  EXCEL_IMPORT
+  MANUAL
+}
+
+model Lead {
+  id             String     @id @default(cuid())
+  firstName      String
+  lastName       String
+  email          String
+  phone          String
+  city           String
+  educationLevel String
+  
+  // Optional fields (from catalogue form)
+  transcript     String?    // File URL - Relevé de notes
+  cv             String?    // File URL
+  diploma        String?    // File URL - Attestation de scolarité ou diplôme
+  passport       String?    // File URL - Passeport ou CIN
+
+  // Lead tracking
+  status         LeadStatus @default(NEW)
+  source         LeadSource @default(HOME_PAGE)
+  
+  // Session preference (online or office)
+  sessionType    String?    // "online" or "office"
+
+  // Related program info (when applying from catalogue)
+  universityName  String?
+  departmentName  String?
+  language        String?
+  level           String?
+
+  // Assignment
+  consultantId   String?
+  consultant     User?      @relation("ConsultantLeads", fields: [consultantId], references: [id])
+
+  // Timestamps
+  createdAt      DateTime   @default(now())
+  updatedAt      DateTime   @updatedAt
+
+  @@map("leads")
+}
+
+// ==========================================
+// 3. STUDENTS (converted from leads or added manually)
+// ==========================================
+
+enum Gender {
+  MALE
+  FEMALE
+  OTHER
+}
+
+model Student {
+  id              String   @id @default(cuid())
+  firstName       String
+  lastName        String
+  gender          Gender
+  dateOfBirth     DateTime
+  passportNumber  String
+  citizenship     String
+  email           String
+  phone           String
+  
+  // Legal Guardian
+  guardianName    String
+  guardianEmail   String
+
+  // Documents (File URLs)
+  transcript      String?   // Required - Relevé de notes
+  passportFile    String?   // Required - Passeport ou CIN
+  diploma         String?   // If graduated
+  languageProof   String?   // Proof of language
+  cv              String?
+  motivationLetter String?
+  additionalDocs  String[]  // Array of additional document URLs
+
+  // Acceptance
+  acceptance      String?   // File URL - uploaded by Application role
+
+  // Assignment
+  consultantId    String?
+  consultant      User?     @relation("ConsultantStudents", fields: [consultantId], references: [id])
+
+  // Notes from Application team
+  notes           StudentNote[]
+
+  // Applications to programs
+  applications    StudentApplication[]
+
+  // Timestamps
+  createdAt       DateTime  @default(now())
+  updatedAt       DateTime  @updatedAt
+
+  @@map("students")
+}
+
+model StudentNote {
+  id        String   @id @default(cuid())
+  content   String
+  authorId  String
+  studentId String
+  student   Student  @relation(fields: [studentId], references: [id], onDelete: Cascade)
+  createdAt DateTime @default(now())
+
+  @@map("student_notes")
+}
+
+model StudentApplication {
+  id        String   @id @default(cuid())
+  studentId String
+  student   Student  @relation(fields: [studentId], references: [id], onDelete: Cascade)
+  programId String
+  program   Program  @relation(fields: [programId], references: [id])
+  status    String   @default("PENDING") // PENDING, ACCEPTED, REJECTED
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@map("student_applications")
+}
+
+// ==========================================
+// 4. COUNTRIES, UNIVERSITIES & PROGRAMS
+// ==========================================
+
+model Country {
+  id        String   @id @default(cuid())
+  name      String   @unique
+  code      String   @unique  // ISO country code (e.g., "TR", "DE")
+  flag      String?  // Flag emoji or URL
+  photo     String?  // Cover photo URL
+  cities    City[]
+  createdAt DateTime @default(now())
+
+  @@map("countries")
+}
+
+model City {
+  id           String       @id @default(cuid())
+  name         String
+  countryId    String
+  country      Country      @relation(fields: [countryId], references: [id], onDelete: Cascade)
+  universities University[]
+  createdAt    DateTime     @default(now())
+
+  @@unique([name, countryId])
+  @@map("cities")
+}
+
+model University {
+  id          String    @id @default(cuid())
+  name        String
+  logo        String?   // Logo URL
+  photo       String?   // Cover photo URL
+  description String?   // Rich text description
+  website     String?
+  cityId      String
+  city        City      @relation(fields: [cityId], references: [id], onDelete: Cascade)
+  programs    Program[]
+  createdAt   DateTime  @default(now())
+  updatedAt   DateTime  @updatedAt
+
+  @@map("universities")
+}
+
+model Program {
+  id             String   @id @default(cuid())
+  name           String   // e.g., "Industrial Engineering"
+  department     String   // e.g., "Engineering"
+  field          String?  // e.g., "Filière"
+  degree         String   // e.g., "Bachelor", "Master"
+  language       String   // e.g., "English", "French", "Turkish"
+  duration       Int      // Duration in years
+  pricePerYear   Float?   // Tuition fee per year
+  currency       String   @default("USD")
+  description    String?
+
+  universityId   String
+  university     University @relation(fields: [universityId], references: [id], onDelete: Cascade)
+
+  // Student applications
+  applications   StudentApplication[]
+
+  createdAt      DateTime @default(now())
+  updatedAt      DateTime @updatedAt
+
+  @@map("programs")
+}
+
+// ==========================================
+// 5. BLOG & CONTENT
+// ==========================================
+
+enum BlogTag {
+  DESTINATION
+  UNIVERSITY
+  GENERAL
+  SCHOLARSHIP
+  TIPS
+}
+
+model Blog {
+  id          String   @id @default(cuid())
+  title       String
+  slug        String   @unique
+  content     String   // Rich text / HTML content
+  excerpt     String?  // Short summary
+  coverImage  String?  // Cover image URL
+  tags        BlogTag[]
+  isPublished Boolean  @default(false)
+  
+  authorId    String
+  author      User     @relation(fields: [authorId], references: [id])
+
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  @@map("blogs")
+}
+
+// ==========================================
+// 6. ANNOUNCEMENTS (Internal)
+// ==========================================
+
+model Announcement {
+  id        String   @id @default(cuid())
+  title     String
+  content   String
+  isActive  Boolean  @default(true)
+  
+  authorId  String
+  author    User     @relation(fields: [authorId], references: [id])
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@map("announcements")
+}

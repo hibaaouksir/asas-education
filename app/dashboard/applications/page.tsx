@@ -27,11 +27,11 @@ export default async function ApplicationsPage() {
     });
   }
 
+  const title = role === "ADMIN" ? "Toutes les Candidatures" : role === "APPLICATION" ? "Candidatures" : "Mes Candidatures";
+
   return (
     <div>
-      <h1 style={{ color: "#001459", fontSize: "24px", fontWeight: "700", marginBottom: "24px" }}>
-        {role === "ADMIN" ? "Toutes les Candidatures" : "Mes Candidatures"}
-      </h1>
+      <h1 style={{ color: "#001459", fontSize: "24px", fontWeight: "700", marginBottom: "24px" }}>{title}</h1>
 
       <ApplicationTable
         applications={applications.map(a => ({
@@ -51,6 +51,7 @@ export default async function ApplicationsPage() {
           createdAt: a.createdAt.toISOString(),
         }))}
         isAdmin={role === "ADMIN" || role === "APPLICATION"}
+        role={role || ""}
       />
     </div>
   );

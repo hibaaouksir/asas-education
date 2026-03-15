@@ -18,7 +18,15 @@ export default async function DashboardPage() {
     : await prisma.lead.count({ where: { consultantId: userId } });
   const consultantCount = role === "ADMIN" ? await prisma.user.count({ where: { role: "CONSULTANT" } }) : 0;
   const agentCount = role === "ADMIN" ? await prisma.user.count({ where: { role: "SUB_AGENT" } }) : 0;
-  const countryCount = role === "ADMIN" ? await prisma.country.count() : 0;
+
+  const appCounts = (role === "ADMIN" || role === "APPLICATION") ? {
+    applied: await prisma.studentApplication.count({ where: { status: "APPLIED" } }),
+    received: await prisma.studentApplication.count({ where: { status: "RECEIVED" } }),
+    offerLetter: await prisma.studentApplication.count({ where: { status: "OFFER_LETTER" } }),
+    paid: await prisma.studentApplication.count({ where: { status: "PAID" } }),
+    finalAdmission: await prisma.studentApplication.count({ where: { status: "FINAL_ADMISSION" } }),
+    total: await prisma.studentApplication.count(),
+  } : null;
 
   const recentLeads = role === "ADMIN" || role === "CONSULTANT" 
     ? await prisma.lead.findMany({
@@ -35,6 +43,14 @@ export default async function DashboardPage() {
     take: 5,
   });
 
+  const recentApplications = (role === "APPLICATION") 
+    ? await prisma.studentApplication.findMany({
+        orderBy: { createdAt: "desc" },
+        take: 5,
+        include: { student: true, program: { include: { university: true } } },
+      })
+    : [];
+
   // Admin layout
   if (role === "ADMIN") {
     return (
@@ -48,8 +64,8 @@ export default async function DashboardPage() {
           {[
             { label: "Leads", count: leadCount, color: "#DDBA52", href: "/dashboard/leads", icon: "📋", sub: "Demandes recues" },
             { label: "Etudiants", count: studentCount, color: "#001459", href: "/dashboard/students", icon: "🎓", sub: "Inscrits" },
-            { label: "Consultants", count: consultantCount, color: "#DD061A", href: "/dashboard/consultants", icon: "💼", sub: "Actifs" },
-            { label: "Agents", count: agentCount, color: "#DDBA52", href: "/dashboard/agents", icon: "👥", sub: "Partenaires" },
+            { label: "Consultants", count: consultantCount, color: "#DD061A", href: "/dashboard/users", icon: "💼", sub: "Actifs" },
+            { label: "Agents", count: agentCount, color: "#DDBA52", href: "/dashboard/users", icon: "👥", sub: "Partenaires" },
             { label: "Universites", count: universityCount, color: "#001459", href: "/dashboard/universities", icon: "🏛", sub: "Partenaires" },
             { label: "Programmes", count: programCount, color: "#DD061A", href: "/dashboard/programs", icon: "📚", sub: "Disponibles" },
           ].map((stat, i) => (
@@ -57,7 +73,7 @@ export default async function DashboardPage() {
               <div style={{
                 backgroundColor: "white", padding: "20px", borderRadius: "14px",
                 boxShadow: "0 1px 4px rgba(0,0,0,0.04)", borderLeft: `4px solid ${stat.color}`,
-                cursor: "pointer", transition: "box-shadow 0.2s",
+                cursor: "pointer",
               }}>
                 <div style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-start" }}>
                   <div>
@@ -125,8 +141,104 @@ export default async function DashboardPage() {
     );
   }
 
+  // APPLICATION layout
+  if (role === "APPLICATION") {
+    return (
+      <div>
+        <div style={{ marginBottom: "32px" }}>
+          <h1 style={{ color: "#001459", fontSize: "28px", fontWeight: "800", margin: "0 0 6px" }}>Bienvenue, {session?.user?.name?.split(" ")[0]}</h1>
+          <p style={{ color: "#888", fontSize: "14px", margin: 0 }}>Gerez les candidatures et le suivi des admissions</p>
+        </div>
+
+        <div style={{ display: "grid", gridTemplateColumns: "2fr 1fr 1fr", gap: "16px", marginBottom: "24px" }}>
+          <Link href="/dashboard/applications" style={{ textDecoration: "none" }}>
+            <div style={{
+              background: "linear-gradient(135deg, #7B1FA2, #9C27B0)", padding: "28px",
+              borderRadius: "16px", color: "white", cursor: "pointer", position: "relative", overflow: "hidden",
+            }}>
+              <div style={{ position: "absolute", top: "-20px", right: "-20px", fontSize: "120px", opacity: 0.06 }}>📄</div>
+              <p style={{ fontSize: "12px", fontWeight: "600", textTransform: "uppercase", letterSpacing: "1px", opacity: 0.7, margin: "0 0 8px" }}>Candidatures</p>
+              <p style={{ fontSize: "42px", fontWeight: "800", margin: "0 0 4px", lineHeight: 1 }}>{appCounts?.total || 0}</p>
+              <p style={{ fontSize: "12px", opacity: 0.5, margin: 0 }}>Total des candidatures</p>
+            </div>
+          </Link>
+          <Link href="/dashboard/students" style={{ textDecoration: "none" }}>
+            <div style={{
+              backgroundColor: "white", padding: "28px", borderRadius: "16px",
+              boxShadow: "0 1px 4px rgba(0,0,0,0.04)", cursor: "pointer",
+              borderTop: "4px solid #001459",
+            }}>
+              <span style={{ fontSize: "28px" }}>🎓</span>
+              <p style={{ color: "#001459", fontSize: "36px", fontWeight: "800", margin: "8px 0 2px", lineHeight: 1 }}>{studentCount}</p>
+              <p style={{ color: "#999", fontSize: "12px", margin: 0 }}>Etudiants</p>
+            </div>
+          </Link>
+          <Link href="/dashboard/announcements" style={{ textDecoration: "none" }}>
+            <div style={{
+              backgroundColor: "white", padding: "28px", borderRadius: "16px",
+              boxShadow: "0 1px 4px rgba(0,0,0,0.04)", cursor: "pointer",
+              borderTop: "4px solid #DD061A",
+            }}>
+              <span style={{ fontSize: "28px" }}>📢</span>
+              <p style={{ color: "#001459", fontSize: "36px", fontWeight: "800", margin: "8px 0 2px", lineHeight: 1 }}>{announcementCount}</p>
+              <p style={{ color: "#999", fontSize: "12px", margin: 0 }}>Annonces</p>
+            </div>
+          </Link>
+        </div>
+
+        <div style={{ display: "grid", gridTemplateColumns: "repeat(5, 1fr)", gap: "12px", marginBottom: "24px" }}>
+          {[
+            { label: "Applied", count: appCounts?.applied || 0, bg: "#E3F2FD", color: "#1565C0" },
+            { label: "Received", count: appCounts?.received || 0, bg: "#FFF3E0", color: "#E65100" },
+            { label: "Offer Letter", count: appCounts?.offerLetter || 0, bg: "#F3E5F5", color: "#7B1FA2" },
+            { label: "Paid", count: appCounts?.paid || 0, bg: "#E8F5E9", color: "#2E7D32" },
+            { label: "Final Admission", count: appCounts?.finalAdmission || 0, bg: "#E8F5E9", color: "#1B5E20" },
+          ].map((stat, i) => (
+            <Link key={i} href="/dashboard/applications" style={{ textDecoration: "none" }}>
+              <div style={{
+                backgroundColor: "white", padding: "16px", borderRadius: "12px",
+                boxShadow: "0 1px 4px rgba(0,0,0,0.04)", textAlign: "center", cursor: "pointer",
+              }}>
+                <p style={{ fontSize: "24px", fontWeight: "800", color: stat.color, margin: "0 0 4px" }}>{stat.count}</p>
+                <span style={{
+                  padding: "3px 8px", borderRadius: "10px", fontSize: "10px", fontWeight: "600",
+                  backgroundColor: stat.bg, color: stat.color,
+                }}>{stat.label}</span>
+              </div>
+            </Link>
+          ))}
+        </div>
+
+        <div style={{ backgroundColor: "white", borderRadius: "14px", boxShadow: "0 1px 4px rgba(0,0,0,0.04)", overflow: "hidden" }}>
+          <div style={{ padding: "18px 20px", borderBottom: "1px solid #f0f0f0", display: "flex", justifyContent: "space-between", alignItems: "center" }}>
+            <h3 style={{ color: "#001459", fontSize: "15px", fontWeight: "700", margin: 0 }}>Dernieres Candidatures</h3>
+            <Link href="/dashboard/applications" style={{ color: "#DDBA52", fontSize: "12px", fontWeight: "600", textDecoration: "none" }}>Voir tout →</Link>
+          </div>
+          {recentApplications.length === 0 ? (
+            <p style={{ padding: "30px", textAlign: "center", color: "#bbb", fontSize: "13px" }}>Aucune candidature</p>
+          ) : (
+            recentApplications.map((app, i) => (
+              <div key={app.id} style={{ padding: "12px 20px", borderBottom: i < recentApplications.length - 1 ? "1px solid #f8f8f8" : "none", display: "flex", justifyContent: "space-between", alignItems: "center" }}>
+                <div>
+                  <p style={{ fontSize: "13px", fontWeight: "600", color: "#001459", margin: "0 0 2px" }}>{app.student.firstName} {app.student.lastName}</p>
+                  <p style={{ fontSize: "11px", color: "#999", margin: 0 }}>{app.program.university.name} - {app.program.name}</p>
+                </div>
+                <span style={{
+                  padding: "3px 10px", borderRadius: "12px", fontSize: "10px", fontWeight: "700",
+                  backgroundColor: app.status === "APPLIED" ? "#E3F2FD" : app.status === "RECEIVED" ? "#FFF3E0" : app.status === "OFFER_LETTER" ? "#F3E5F5" : "#E8F5E9",
+                  color: app.status === "APPLIED" ? "#1565C0" : app.status === "RECEIVED" ? "#E65100" : app.status === "OFFER_LETTER" ? "#7B1FA2" : "#2E7D32",
+                }}>{app.status.replace("_", " ")}</span>
+              </div>
+            ))
+          )}
+        </div>
+      </div>
+    );
+  }
+
   // Consultant layout
   if (role === "CONSULTANT") {
+    const consultantLeadCount = await prisma.lead.count({ where: { consultantId: userId } });
     return (
       <div>
         <div style={{ marginBottom: "32px" }}>
@@ -142,7 +254,7 @@ export default async function DashboardPage() {
             }}>
               <div style={{ position: "absolute", top: "-20px", right: "-20px", fontSize: "120px", opacity: 0.06 }}>📋</div>
               <p style={{ fontSize: "12px", fontWeight: "600", textTransform: "uppercase", letterSpacing: "1px", opacity: 0.7, margin: "0 0 8px" }}>Mes Leads</p>
-              <p style={{ fontSize: "42px", fontWeight: "800", margin: "0 0 4px", lineHeight: 1 }}>{leadCount}</p>
+              <p style={{ fontSize: "42px", fontWeight: "800", margin: "0 0 4px", lineHeight: 1 }}>{consultantLeadCount}</p>
               <p style={{ fontSize: "12px", opacity: 0.5, margin: 0 }}>Demandes a traiter</p>
             </div>
           </Link>

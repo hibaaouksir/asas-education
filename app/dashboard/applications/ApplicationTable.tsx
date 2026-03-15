@@ -19,7 +19,7 @@ const statusConfig: Record<string, { label: string; bg: string; color: string }>
   FINAL_ADMISSION: { label: "Final Admission", bg: "#E8F5E9", color: "#1B5E20" },
 };
 
-export default function ApplicationTable({ applications, isAdmin }: { applications: Application[]; isAdmin: boolean }) {
+export default function ApplicationTable({ applications, isAdmin, role }: { applications: Application[]; isAdmin: boolean; role: string }) {
   const router = useRouter();
   const [filter, setFilter] = useState("ALL");
   const [uploading, setUploading] = useState("");
@@ -34,6 +34,18 @@ export default function ApplicationTable({ applications, isAdmin }: { applicatio
     PAID: applications.filter(a => a.status === "PAID").length,
     FINAL_ADMISSION: applications.filter(a => a.status === "FINAL_ADMISSION").length,
   };
+
+  const canChangeStatus = role === "ADMIN" || role === "APPLICATION" || role === "CONSULTANT";
+  const canUploadDocs = role === "ADMIN" || role === "APPLICATION";
+
+  const getAllowedStatuses = () => {
+    if (role === "ADMIN") return Object.keys(statusConfig);
+    if (role === "APPLICATION") return ["APPLIED", "RECEIVED", "OFFER_LETTER", "FINAL_ADMISSION"];
+    if (role === "CONSULTANT") return ["APPLIED", "RECEIVED", "OFFER_LETTER", "PAID", "FINAL_ADMISSION"];
+    return [];
+  };
+
+  const allowedStatuses = getAllowedStatuses();
 
   const handleStatusChange = async (appId: string, newStatus: string) => {
     await fetch(`/api/applications/${appId}`, {
@@ -88,14 +100,14 @@ export default function ApplicationTable({ applications, isAdmin }: { applicatio
               <th style={{ padding: "12px 16px", textAlign: "left", fontSize: "12px", color: "#888", fontWeight: "600", textTransform: "uppercase" }}>Universite</th>
               <th style={{ padding: "12px 16px", textAlign: "left", fontSize: "12px", color: "#888", fontWeight: "600", textTransform: "uppercase" }}>Programme</th>
               <th style={{ padding: "12px 16px", textAlign: "left", fontSize: "12px", color: "#888", fontWeight: "600", textTransform: "uppercase" }}>Niveau</th>
-              {isAdmin && <th style={{ padding: "12px 16px", textAlign: "left", fontSize: "12px", color: "#888", fontWeight: "600", textTransform: "uppercase" }}>Source</th>}
+              {(role === "ADMIN" || role === "APPLICATION") && <th style={{ padding: "12px 16px", textAlign: "left", fontSize: "12px", color: "#888", fontWeight: "600", textTransform: "uppercase" }}>Source</th>}
               <th style={{ padding: "12px 16px", textAlign: "left", fontSize: "12px", color: "#888", fontWeight: "600", textTransform: "uppercase" }}>Statut</th>
-              {isAdmin && <th style={{ padding: "12px 16px", textAlign: "left", fontSize: "12px", color: "#888", fontWeight: "600", textTransform: "uppercase" }}>Documents</th>}
+              {canUploadDocs && <th style={{ padding: "12px 16px", textAlign: "left", fontSize: "12px", color: "#888", fontWeight: "600", textTransform: "uppercase" }}>Documents</th>}
             </tr>
           </thead>
           <tbody>
             {filtered.length === 0 ? (
-              <tr><td colSpan={isAdmin ? 7 : 5} style={{ padding: "40px", textAlign: "center", color: "#888", fontSize: "14px" }}>Aucune candidature.</td></tr>
+              <tr><td colSpan={7} style={{ padding: "40px", textAlign: "center", color: "#888", fontSize: "14px" }}>Aucune candidature.</td></tr>
             ) : (
               filtered.map((app) => {
                 const config = statusConfig[app.status] || statusConfig.APPLIED;
@@ -113,20 +125,20 @@ export default function ApplicationTable({ applications, isAdmin }: { applicatio
                     <td style={{ padding: "12px 16px" }}>
                       <span style={{ padding: "3px 10px", borderRadius: "12px", fontSize: "11px", fontWeight: "600", backgroundColor: "#E3F2FD", color: "#1565C0" }}>{app.degree}</span>
                     </td>
-                    {isAdmin && (
+                    {(role === "ADMIN" || role === "APPLICATION") && (
                       <td style={{ padding: "12px 16px" }}>
                         <span style={{ fontSize: "12px", color: "#888" }}>{app.source}</span>
                       </td>
                     )}
                     <td style={{ padding: "12px 16px" }}>
-                      {isAdmin ? (
+                      {canChangeStatus ? (
                         <select value={app.status} onChange={(e) => handleStatusChange(app.id, e.target.value)} style={{
                           padding: "4px 10px", borderRadius: "20px", border: "none",
                           fontSize: "12px", fontWeight: "600", cursor: "pointer",
                           backgroundColor: config.bg, color: config.color,
                         }}>
-                          {Object.entries(statusConfig).map(([key, val]) => (
-                            <option key={key} value={key}>{val.label}</option>
+                          {allowedStatuses.map((key) => (
+                            <option key={key} value={key}>{statusConfig[key].label}</option>
                           ))}
                         </select>
                       ) : (
@@ -136,7 +148,7 @@ export default function ApplicationTable({ applications, isAdmin }: { applicatio
                         }}>{config.label}</span>
                       )}
                     </td>
-                    {isAdmin && (
+                    {canUploadDocs && (
                       <td style={{ padding: "12px 16px" }}>
                         <div style={{ display: "flex", gap: "6px", flexDirection: "column" }}>
                           {app.offerLetter ? (

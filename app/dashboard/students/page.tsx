@@ -19,7 +19,7 @@ export default async function StudentsPage() {
         applications: { include: { program: { include: { university: true } } } },
       },
     });
-    title = "Tous les Etudiants";
+    title = role === "ADMIN" ? "Tous les Etudiants" : "Etudiants";
   } else if (role === "CONSULTANT") {
     students = await prisma.student.findMany({
       where: { consultantId: userId },
@@ -44,7 +44,7 @@ export default async function StudentsPage() {
 
   const canChangeStatus = role === "ADMIN" || role === "APPLICATION" || role === "CONSULTANT";
   const canAddStudent = role === "SUB_AGENT" || role === "ADMIN" || role === "CONSULTANT";
-  const showSource = role === "ADMIN";
+  const showSource = role === "ADMIN" || role === "APPLICATION";
 
   return (
     <div>

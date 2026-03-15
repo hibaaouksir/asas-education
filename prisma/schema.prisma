@@ -34,7 +34,6 @@ model User {
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 
-  // Relations
   assignedLeads Lead[]    @relation("ConsultantLeads")
   students      Student[] @relation("ConsultantStudents")
   announcements Announcement[]
@@ -73,31 +72,25 @@ model Lead {
   phone          String
   city           String
   educationLevel String
-  
-  // Optional fields (from catalogue form)
-  transcript     String?    // File URL - Relevé de notes
-  cv             String?    // File URL
-  diploma        String?    // File URL - Attestation de scolarité ou diplôme
-  passport       String?    // File URL - Passeport ou CIN
 
-  // Lead tracking
+  transcript     String?
+  cv             String?
+  diploma        String?
+  passport       String?
+
   status         LeadStatus @default(NEW)
   source         LeadSource @default(HOME_PAGE)
-  
-  // Session preference (online or office)
-  sessionType    String?    // "online" or "office"
 
-  // Related program info (when applying from catalogue)
+  sessionType    String?
+
   universityName  String?
   departmentName  String?
   language        String?
   level           String?
 
-  // Assignment
   consultantId   String?
   consultant     User?      @relation("ConsultantLeads", fields: [consultantId], references: [id])
 
-  // Timestamps
   createdAt      DateTime   @default(now())
   updatedAt      DateTime   @updatedAt
 
@@ -105,7 +98,7 @@ model Lead {
 }
 
 // ==========================================
-// 3. STUDENTS (converted from leads or added manually)
+// 3. STUDENTS
 // ==========================================
 
 enum Gender {
@@ -124,36 +117,27 @@ model Student {
   citizenship     String
   email           String
   phone           String
-  
-  // Legal Guardian
+
   guardianName    String
   guardianEmail   String
 
-  // Documents (File URLs)
-  transcript      String?   // Required - Relevé de notes
-  passportFile    String?   // Required - Passeport ou CIN
-  diploma         String?   // If graduated
-  languageProof   String?   // Proof of language
+  transcript      String?
+  passportFile    String?
+  diploma         String?
+  languageProof   String?
   cv              String?
   motivationLetter String?
-  additionalDocs  String[]  // Array of additional document URLs
+  additionalDocs  String[]
 
-  // Acceptance
-  acceptance      String?   // File URL - uploaded by Application role
+  acceptance      String?
   status          String   @default("EN_ATTENTE")
-  
 
-  // Assignment
   consultantId    String?
   consultant      User?     @relation("ConsultantStudents", fields: [consultantId], references: [id])
 
-  // Notes from Application team
   notes           StudentNote[]
-
-  // Applications to programs
   applications    StudentApplication[]
 
-  // Timestamps
   createdAt       DateTime  @default(now())
   updatedAt       DateTime  @updatedAt
 
@@ -177,7 +161,9 @@ model StudentApplication {
   student   Student  @relation(fields: [studentId], references: [id], onDelete: Cascade)
   programId String
   program   Program  @relation(fields: [programId], references: [id])
-  status    String   @default("PENDING") // PENDING, ACCEPTED, REJECTED
+  status    String   @default("APPLIED") // APPLIED, RECEIVED, OFFER_LETTER, PAID, FINAL_ADMISSION
+  offerLetter String?
+  finalAdmission String?
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 
@@ -191,9 +177,9 @@ model StudentApplication {
 model Country {
   id        String   @id @default(cuid())
   name      String   @unique
-  code      String   @unique  // ISO country code (e.g., "TR", "DE")
-  flag      String?  // Flag emoji or URL
-  photo     String?  // Cover photo URL
+  code      String   @unique
+  flag      String?
+  photo     String?
   cities    City[]
   createdAt DateTime @default(now())
 
@@ -215,9 +201,9 @@ model City {
 model University {
   id          String    @id @default(cuid())
   name        String
-  logo        String?   // Logo URL
-  photo       String?   // Cover photo URL
-  description String?   // Rich text description
+  logo        String?
+  photo       String?
+  description String?
   website     String?
   cityId      String
   city        City      @relation(fields: [cityId], references: [id], onDelete: Cascade)
@@ -230,20 +216,19 @@ model University {
 
 model Program {
   id             String   @id @default(cuid())
-  name           String   // e.g., "Industrial Engineering"
-  department     String   // e.g., "Engineering"
-  field          String?  // e.g., "Filière"
-  degree         String   // e.g., "Bachelor", "Master"
-  language       String   // e.g., "English", "French", "Turkish"
-  duration       Int      // Duration in years
-  pricePerYear   Float?   // Tuition fee per year
+  name           String
+  department     String
+  field          String?
+  degree         String
+  language       String
+  duration       Int
+  pricePerYear   Float?
   currency       String   @default("USD")
   description    String?
 
   universityId   String
   university     University @relation(fields: [universityId], references: [id], onDelete: Cascade)
 
-  // Student applications
   applications   StudentApplication[]
 
   createdAt      DateTime @default(now())
@@ -268,12 +253,12 @@ model Blog {
   id          String   @id @default(cuid())
   title       String
   slug        String   @unique
-  content     String   // Rich text / HTML content
-  excerpt     String?  // Short summary
-  coverImage  String?  // Cover image URL
+  content     String
+  excerpt     String?
+  coverImage  String?
   tags        BlogTag[]
   isPublished Boolean  @default(false)
-  
+
   authorId    String
   author      User     @relation(fields: [authorId], references: [id])
 
@@ -284,7 +269,7 @@ model Blog {
 }
 
 // ==========================================
-// 6. ANNOUNCEMENTS (Internal)
+// 6. ANNOUNCEMENTS
 // ==========================================
 
 model Announcement {
@@ -292,7 +277,7 @@ model Announcement {
   title     String
   content   String
   isActive  Boolean  @default(true)
-  
+
   authorId  String
   author    User     @relation(fields: [authorId], references: [id])
 

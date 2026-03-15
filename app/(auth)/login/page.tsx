@@ -52,77 +52,38 @@ export default function LoginPage() {
             ASAS FOR EDUCATION
           </h1>
           <p style={{ color: "#666", fontSize: "14px" }}>
-            Connectez-vous à votre espace
+            Connectez-vous a votre espace
           </p>
         </div>
 
         <form onSubmit={handleSubmit}>
           <div style={{ marginBottom: "16px" }}>
-            <label style={{ display: "block", marginBottom: "6px", color: "#333", fontSize: "14px" }}>
-              Email
-            </label>
-            <input
-              type="email"
-              value={email}
-              onChange={(e) => setEmail(e.target.value)}
-              required
-              style={{
-                width: "100%",
-                padding: "10px 12px",
-                border: "1px solid #ddd",
-                borderRadius: "8px",
-                fontSize: "14px",
-                boxSizing: "border-box",
-              }}
-              placeholder="votre@email.com"
-            />
+            <label style={{ display: "block", marginBottom: "6px", color: "#333", fontSize: "14px" }}>Email</label>
+            <input type="email" value={email} onChange={(e) => setEmail(e.target.value)} required style={{
+              width: "100%", padding: "10px 12px", border: "1px solid #ddd",
+              borderRadius: "8px", fontSize: "14px", boxSizing: "border-box",
+            }} placeholder="votre@email.com" />
           </div>
 
           <div style={{ marginBottom: "24px" }}>
-            <label style={{ display: "block", marginBottom: "6px", color: "#333", fontSize: "14px" }}>
-              Mot de passe
-            </label>
-            <input
-              type="password"
-              value={password}
-              onChange={(e) => setPassword(e.target.value)}
-              required
-              style={{
-                width: "100%",
-                padding: "10px 12px",
-                border: "1px solid #ddd",
-                borderRadius: "8px",
-                fontSize: "14px",
-                boxSizing: "border-box",
-              }}
-              placeholder="••••••••"
-            />
+            <label style={{ display: "block", marginBottom: "6px", color: "#333", fontSize: "14px" }}>Mot de passe</label>
+            <input type="password" value={password} onChange={(e) => setPassword(e.target.value)} required style={{
+              width: "100%", padding: "10px 12px", border: "1px solid #ddd",
+              borderRadius: "8px", fontSize: "14px", boxSizing: "border-box",
+            }} placeholder="........" />
           </div>
 
           {error && (
-            <p style={{ color: "#DD061A", fontSize: "14px", marginBottom: "16px", textAlign: "center" }}>
-              {error}
-            </p>
+            <p style={{ color: "#DD061A", fontSize: "14px", marginBottom: "16px", textAlign: "center" }}>{error}</p>
           )}
 
-          <button
-            type="submit"
-            disabled={loading}
-            style={{
-              width: "100%",
-              padding: "12px",
-              backgroundColor: "#DDBA52",
-              color: "#001459",
-              border: "none",
-              borderRadius: "8px",
-              fontSize: "16px",
-              fontWeight: "bold",
-              cursor: loading ? "not-allowed" : "pointer",
-              opacity: loading ? 0.7 : 1,
-            }}
-          >
-            {loading ? "Connexion..." : "Se connecter"}
-          </button>
+          <button type="submit" disabled={loading} style={{
+            width: "100%", padding: "12px", backgroundColor: "#DDBA52",
+            color: "#001459", border: "none", borderRadius: "8px",
+            fontSize: "16px", fontWeight: "bold",
+            cursor: loading ? "not-allowed" : "pointer",
+            opacity: loading ? 0.7 : 1,
+          }}>{loading ? "Connexion..." : "Se connecter"}</button>
         </form>
       </div>
     </div>

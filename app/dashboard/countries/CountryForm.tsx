@@ -3,23 +3,32 @@
 import { useState } from "react";
 import { useRouter } from "next/navigation";
 
+function codeToFlag(code: string): string {
+  return code
+    .toUpperCase()
+    .split("")
+    .map((c) => String.fromCodePoint(0x1f1e6 + c.charCodeAt(0) - 65))
+    .join("");
+}
+
 export default function CountryForm() {
   const router = useRouter();
   const [open, setOpen] = useState(false);
   const [loading, setLoading] = useState(false);
-  const [form, setForm] = useState({ name: "", code: "", flag: "" });
+  const [form, setForm] = useState({ name: "", code: "" });
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setLoading(true);
     try {
+      const flag = codeToFlag(form.code);
       const res = await fetch("/api/countries", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(form),
+        body: JSON.stringify({ ...form, flag }),
       });
       if (res.ok) {
-        setForm({ name: "", code: "", flag: "" });
+        setForm({ name: "", code: "" });
         setOpen(false);
         router.refresh();
       }
@@ -51,19 +60,18 @@ export default function CountryForm() {
       boxShadow: "0 2px 8px rgba(0,0,0,0.04)", marginBottom: "16px",
     }}>
       <h3 style={{ color: "#001459", fontSize: "16px", fontWeight: "700", marginBottom: "16px" }}>Nouveau pays</h3>
-      <form onSubmit={handleSubmit} style={{ display: "grid", gridTemplateColumns: "1fr 1fr 1fr auto", gap: "12px", alignItems: "end" }}>
-        <div>
+      <form onSubmit={handleSubmit} style={{ display: "flex", gap: "12px", alignItems: "end" }}>
+        <div style={{ flex: 1 }}>
           <label style={{ display: "block", marginBottom: "4px", fontSize: "12px", color: "#666", fontWeight: "600" }}>Nom du pays *</label>
           <input required style={inputStyle} placeholder="Ex: Turquie" value={form.name} onChange={(e) => setForm({ ...form, name: e.target.value })} />
         </div>
-        <div>
+        <div style={{ width: "120px" }}>
           <label style={{ display: "block", marginBottom: "4px", fontSize: "12px", color: "#666", fontWeight: "600" }}>Code ISO *</label>
-          <input required style={inputStyle} placeholder="Ex: TR" maxLength={3} value={form.code} onChange={(e) => setForm({ ...form, code: e.target.value.toUpperCase() })} />
+          <input required style={inputStyle} placeholder="Ex: TR" maxLength={2} value={form.code} onChange={(e) => setForm({ ...form, code: e.target.value.toUpperCase() })} />
         </div>
-        <div>
-          <label style={{ display: "block", marginBottom: "4px", fontSize: "12px", color: "#666", fontWeight: "600" }}>Drapeau (emoji)</label>
-          <input style={inputStyle} placeholder="Ex: 🇹🇷" value={form.flag} onChange={(e) => setForm({ ...form, flag: e.target.value })} />
-        </div>
+        {form.code.length === 2 && (
+          <div style={{ fontSize: "32px", paddingBottom: "4px" }}>{codeToFlag(form.code)}</div>
+        )}
         <div style={{ display: "flex", gap: "8px" }}>
           <button type="submit" disabled={loading} style={{
             padding: "10px 20px", borderRadius: "8px", border: "none",

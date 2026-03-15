@@ -140,6 +140,8 @@ model Student {
 
   // Acceptance
   acceptance      String?   // File URL - uploaded by Application role
+  status          String   @default("EN_ATTENTE")
+  
 
   // Assignment
   consultantId    String?

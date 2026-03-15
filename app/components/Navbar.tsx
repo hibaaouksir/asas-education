@@ -1,14 +1,11 @@
 "use client";
 
 import Link from "next/link";
-import { useState } from "react";
 
 export default function Navbar() {
-  const [menuOpen, setMenuOpen] = useState(false);
-
   return (
     <nav style={{
-      backgroundColor: "#001459",
+      backgroundColor: "white",
       padding: "0 40px",
       display: "flex",
       justifyContent: "space-between",
@@ -18,31 +15,26 @@ export default function Navbar() {
       top: 0,
       zIndex: 1000,
       fontFamily: "Poppins, sans-serif",
+      boxShadow: "0 2px 8px rgba(0,0,0,0.06)",
     }}>
       <Link href="/" style={{ textDecoration: "none", display: "flex", alignItems: "center", gap: "10px" }}>
-        <span style={{ color: "#DDBA52", fontSize: "22px", fontWeight: "bold", letterSpacing: "1px" }}>
-          ASAS
-        </span>
-        <span style={{ color: "white", fontSize: "12px", lineHeight: "1.2" }}>
-          FOR EDUCATION
-        </span>
+        <img src="/images/logo.png" alt="ASAS" style={{ height: "50px", objectFit: "contain" }} />
       </Link>
 
-      <div style={{
-        display: "flex",
-        alignItems: "center",
-        gap: "32px",
-      }}>
-        <Link href="/programmes" style={{ color: "white", textDecoration: "none", fontSize: "14px", fontWeight: "500" }}>
+      <div style={{ display: "flex", alignItems: "center", gap: "28px" }}>
+        <Link href="/programmes" style={{ color: "#001459", textDecoration: "none", fontSize: "14px", fontWeight: "600" }}>
           Programmes
         </Link>
-        <Link href="/destinations" style={{ color: "white", textDecoration: "none", fontSize: "14px", fontWeight: "500" }}>
+        <Link href="/destinations" style={{ color: "#001459", textDecoration: "none", fontSize: "14px", fontWeight: "600" }}>
           Destinations
         </Link>
-        <Link href="/universites" style={{ color: "white", textDecoration: "none", fontSize: "14px", fontWeight: "500" }}>
+        <Link href="/universites" style={{ color: "#001459", textDecoration: "none", fontSize: "14px", fontWeight: "600" }}>
           Universites
         </Link>
-        <Link href="/contact" style={{ color: "white", textDecoration: "none", fontSize: "14px", fontWeight: "500" }}>
+        <Link href="/blog" style={{ color: "#001459", textDecoration: "none", fontSize: "14px", fontWeight: "600" }}>
+          Blog
+        </Link>
+        <Link href="/contact" style={{ color: "#001459", textDecoration: "none", fontSize: "14px", fontWeight: "600" }}>
           Contact
         </Link>
         <Link href="#booking" style={{

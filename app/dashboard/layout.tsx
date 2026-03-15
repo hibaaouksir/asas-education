@@ -14,6 +14,7 @@ export default async function DashboardLayout({ children }: { children: React.Re
     { label: "Dashboard", href: "/dashboard", icon: "📊", roles: ["ADMIN", "APPLICATION", "CONSULTANT", "SUB_AGENT"] },
     { label: "Leads", href: "/dashboard/leads", icon: "📋", roles: ["ADMIN", "CONSULTANT"] },
     { label: "Etudiants", href: "/dashboard/students", icon: "🎓", roles: ["ADMIN", "APPLICATION", "CONSULTANT", "SUB_AGENT"] },
+    { label: "Candidatures", href: "/dashboard/applications", icon: "📄", roles: ["ADMIN", "APPLICATION", "CONSULTANT", "SUB_AGENT"] },
     { label: "Consultants", href: "/dashboard/consultants", icon: "💼", roles: ["ADMIN"] },
     { label: "Agents", href: "/dashboard/agents", icon: "👥", roles: ["ADMIN"] },
     { label: "Pays", href: "/dashboard/countries", icon: "🌍", roles: ["ADMIN"] },

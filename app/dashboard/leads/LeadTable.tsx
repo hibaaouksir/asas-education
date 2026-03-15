@@ -70,6 +70,16 @@ export default function LeadTable({ leads, consultants, isAdmin }: { leads: Lead
 
   return (
     <div>
+      {isAdmin && (
+        <div style={{ display: "flex", gap: "8px", marginBottom: "16px" }}>
+          <a href="/api/export?type=leads" style={{
+            padding: "8px 16px", borderRadius: "8px", border: "1px solid #2E7D32",
+            backgroundColor: "transparent", color: "#2E7D32", fontSize: "13px",
+            fontWeight: "600", textDecoration: "none",
+          }}>Export Excel</a>
+        </div>
+      )}
+
       <div style={{ display: "flex", gap: "8px", marginBottom: "20px", flexWrap: "wrap" }}>
         {[{ key: "ALL", label: "Tous" }, ...Object.entries(statusConfig).map(([key, val]) => ({ key, label: val.label }))].map(({ key, label }) => (
           <button key={key} onClick={() => setFilter(key)} style={{
@@ -137,7 +147,7 @@ export default function LeadTable({ leads, consultants, isAdmin }: { leads: Lead
                           backgroundColor: "#DDBA52", color: "#001459", fontSize: "11px",
                           fontWeight: "700", cursor: "pointer",
                           opacity: converting === lead.id ? 0.7 : 1,
-                        }}>{converting === lead.id ? "..." : "Convertir en Etudiant"}</button>
+                        }}>{converting === lead.id ? "..." : "→ Etudiant"}</button>
                       )}
                     </td>
                   </tr>

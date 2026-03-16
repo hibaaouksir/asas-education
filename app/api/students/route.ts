@@ -4,7 +4,6 @@ import { NextResponse } from "next/server";
 export async function POST(request: Request) {
   try {
     const body = await request.json();
-
     const student = await prisma.student.create({
       data: {
         firstName: body.firstName,
@@ -23,12 +22,9 @@ export async function POST(request: Request) {
         cv: body.cv || null,
         motivationLetter: body.motivationLetter || null,
         consultantId: body.consultantId || null,
-        applications: body.programId ? {
-          create: { programId: body.programId },
-        } : undefined,
+        desiredProgramId: body.programId || null,
       },
     });
-
     return NextResponse.json(student, { status: 201 });
   } catch (error) {
     console.error("Error creating student:", error);

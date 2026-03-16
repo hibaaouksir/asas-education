@@ -34,7 +34,7 @@ export default async function LeadsPage() {
           city: l.city,
           educationLevel: l.educationLevel,
           status: l.status,
-          source: l.source,
+          source: l.sourceName || "Site Web",
           universityName: l.universityName || "-",
           consultantId: l.consultantId || "",
           consultantName: l.consultant ? `${l.consultant.firstName} ${l.consultant.lastName}` : "-",

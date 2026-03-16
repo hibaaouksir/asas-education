@@ -66,8 +66,8 @@ export default function StudentForm({ userId, programs }: { userId: string; prog
 
   const docFields = [
     { key: "transcript", label: "Releve de notes" },
-    { key: "diploma", label: "Diplome" },
-    { key: "passportFile", label: "Passeport" },
+    { key: "diploma", label: "Attestation de scolarite ou diplome" },
+    { key: "passportFile", label: "Passeport ou CIN" },
     { key: "cv", label: "CV" },
     { key: "motivationLetter", label: "Lettre de motivation" },
   ];
@@ -97,7 +97,7 @@ export default function StudentForm({ userId, programs }: { userId: string; prog
             <input required type="date" style={inputStyle} value={form.dateOfBirth} onChange={(e) => setForm({ ...form, dateOfBirth: e.target.value })} />
           </div>
           <div>
-            <label style={labelStyle}>Numero de passeport *</label>
+            <label style={labelStyle}>Numero de passeport ou CIN *</label>
             <input required style={inputStyle} value={form.passportNumber} onChange={(e) => setForm({ ...form, passportNumber: e.target.value })} />
           </div>
           <div>
@@ -162,3 +162,4 @@ export default function StudentForm({ userId, programs }: { userId: string; prog
     </form>
   );
 }
+

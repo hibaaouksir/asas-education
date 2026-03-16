@@ -1,11 +1,7 @@
 import { prisma } from "@/lib/prisma";
-import { auth } from "@/lib/auth";
 import SearchProgramsClient from "./SearchProgramsClient";
 
 export default async function SearchProgramsPage() {
-  const session = await auth();
-  const userId = session?.user?.id;
-
   const programs = await prisma.program.findMany({
     include: { university: { include: { city: { include: { country: true } } } } },
     orderBy: { university: { name: "asc" } },
@@ -13,11 +9,6 @@ export default async function SearchProgramsPage() {
 
   const countries = await prisma.country.findMany({ orderBy: { name: "asc" } });
   const cities = await prisma.city.findMany({ include: { country: true }, orderBy: { name: "asc" } });
-
-  const students = await prisma.student.findMany({
-    where: { consultantId: userId },
-    orderBy: { firstName: "asc" },
-  });
 
   return (
     <SearchProgramsClient
@@ -35,10 +26,10 @@ export default async function SearchProgramsPage() {
         cityName: p.university.city.name,
         countryName: p.university.city.country.name,
         countryCode: p.university.city.country.code,
+        field: p.field || "",
       }))}
       countries={countries.map(c => ({ id: c.id, name: c.name, code: c.code }))}
       cities={cities.map(c => ({ id: c.id, name: c.name, countryId: c.countryId }))}
-      students={students.map(s => ({ id: s.id, name: `${s.firstName} ${s.lastName}` }))}
     />
   );
 }

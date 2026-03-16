@@ -20,6 +20,7 @@ export default async function DashboardLayout({ children }: { children: React.Re
     { label: "Universites", href: "/dashboard/universities", icon: "🏛", roles: ["ADMIN", "CONSULTANT", "SUB_AGENT"] },
     { label: "Recherche Programme", href: "/dashboard/search-programs", icon: "🔍", roles: ["CONSULTANT", "SUB_AGENT"] },
     { label: "Programmes", href: "/dashboard/programs", icon: "📚", roles: ["ADMIN"] },
+    { label: "Sources", href: "/dashboard/sources", icon: "📡", roles: ["ADMIN"] },
     { label: "Blog", href: "/dashboard/blog", icon: "✏️", roles: ["ADMIN", "APPLICATION"] },
     { label: "Annonces", href: "/dashboard/announcements", icon: "📢", roles: ["ADMIN", "APPLICATION", "CONSULTANT", "SUB_AGENT"] },
   ];

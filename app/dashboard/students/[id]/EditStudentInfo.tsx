@@ -16,10 +16,12 @@ type Props = {
     citizenship: string;
     guardianName: string;
     guardianEmail: string;
+    desiredProgramId: string;
   };
+  programs: { id: string; name: string; degree: string; universityName: string; countryName: string }[];
 };
 
-export default function EditStudentInfo({ studentId, initialData }: Props) {
+export default function EditStudentInfo({ studentId, initialData, programs }: Props) {
   const router = useRouter();
   const [form, setForm] = useState(initialData);
   const [loading, setLoading] = useState(false);
@@ -39,7 +41,7 @@ export default function EditStudentInfo({ studentId, initialData }: Props) {
         router.refresh();
       } else {
         const data = await res.json();
-        alert(data.error || "Erreur");
+        window.alert(data.error || "Erreur");
       }
     } catch (err) {
       console.error(err);
@@ -106,6 +108,20 @@ export default function EditStudentInfo({ studentId, initialData }: Props) {
           <label style={labelStyle}>Email du tuteur</label>
           <input type="email" style={{ ...inputStyle, borderColor: !form.guardianEmail ? "#E65100" : "#ddd" }} placeholder="A completer" value={form.guardianEmail} onChange={(e) => setForm({ ...form, guardianEmail: e.target.value })} />
         </div>
+      </div>
+
+      <div style={{ marginTop: "16px", paddingTop: "16px", borderTop: "1px solid #f0f0f0" }}>
+        <label style={{ ...labelStyle, fontSize: "13px", color: "#001459", fontWeight: "700", marginBottom: "8px" }}>Programme souhaite</label>
+        <select
+          style={{ ...inputStyle, cursor: "pointer", borderColor: !form.desiredProgramId ? "#E65100" : "#ddd" }}
+          value={form.desiredProgramId}
+          onChange={(e) => setForm({ ...form, desiredProgramId: e.target.value })}
+        >
+          <option value="">Selectionnez un programme</option>
+          {programs.map((p) => (
+            <option key={p.id} value={p.id}>{p.universityName} - {p.name} ({p.degree}) - {p.countryName}</option>
+          ))}
+        </select>
       </div>
 
       <button onClick={handleSave} disabled={loading} style={{

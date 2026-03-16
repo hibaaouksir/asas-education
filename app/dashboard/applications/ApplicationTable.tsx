@@ -35,13 +35,12 @@ export default function ApplicationTable({ applications, isAdmin, role }: { appl
     FINAL_ADMISSION: applications.filter(a => a.status === "FINAL_ADMISSION").length,
   };
 
-  const canChangeStatus = role === "ADMIN" || role === "APPLICATION" || role === "CONSULTANT";
+  const canChangeStatus = role === "ADMIN" || role === "APPLICATION";
   const canUploadDocs = role === "ADMIN" || role === "APPLICATION";
 
   const getAllowedStatuses = () => {
     if (role === "ADMIN") return Object.keys(statusConfig);
     if (role === "APPLICATION") return ["APPLIED", "RECEIVED", "OFFER_LETTER", "FINAL_ADMISSION"];
-    if (role === "CONSULTANT") return ["APPLIED", "RECEIVED", "OFFER_LETTER", "PAID", "FINAL_ADMISSION"];
     return [];
   };
 
@@ -57,24 +56,34 @@ export default function ApplicationTable({ applications, isAdmin, role }: { appl
   };
 
   const handleUploadDoc = async (appId: string, field: string, file: File) => {
+    if (!file.name.toLowerCase().endsWith(".pdf")) {
+      window.alert("Seuls les fichiers PDF sont acceptes pour ce document.");
+      return;
+    }
     setUploading(`${appId}-${field}`);
     const formData = new FormData();
     formData.append("file", file);
     formData.append("upload_preset", "asas_uploads");
+    formData.append("resource_type", "raw");
     try {
-      const res = await fetch("https://api.cloudinary.com/v1_1/di2ekf6v5/auto/upload", {
+      const res = await fetch("https://api.cloudinary.com/v1_1/di2ekf6v5/raw/upload", {
         method: "POST",
         body: formData,
       });
       const data = await res.json();
-      await fetch(`/api/applications/${appId}`, {
-        method: "PUT",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ [field]: data.secure_url }),
-      });
-      router.refresh();
+      if (data.secure_url) {
+        await fetch(`/api/applications/${appId}`, {
+          method: "PUT",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ [field]: data.secure_url }),
+        });
+        router.refresh();
+      } else {
+        window.alert("Erreur lors de l'upload: " + (data.error?.message || "Erreur inconnue"));
+      }
     } catch (err) {
       console.error(err);
+      window.alert("Erreur de connexion");
     }
     setUploading("");
   };
@@ -102,7 +111,7 @@ export default function ApplicationTable({ applications, isAdmin, role }: { appl
               <th style={{ padding: "12px 16px", textAlign: "left", fontSize: "12px", color: "#888", fontWeight: "600", textTransform: "uppercase" }}>Niveau</th>
               {(role === "ADMIN" || role === "APPLICATION") && <th style={{ padding: "12px 16px", textAlign: "left", fontSize: "12px", color: "#888", fontWeight: "600", textTransform: "uppercase" }}>Source</th>}
               <th style={{ padding: "12px 16px", textAlign: "left", fontSize: "12px", color: "#888", fontWeight: "600", textTransform: "uppercase" }}>Statut</th>
-              {canUploadDocs && <th style={{ padding: "12px 16px", textAlign: "left", fontSize: "12px", color: "#888", fontWeight: "600", textTransform: "uppercase" }}>Documents</th>}
+              <th style={{ padding: "12px 16px", textAlign: "left", fontSize: "12px", color: "#888", fontWeight: "600", textTransform: "uppercase" }}>Documents</th>
             </tr>
           </thead>
           <tbody>
@@ -148,28 +157,39 @@ export default function ApplicationTable({ applications, isAdmin, role }: { appl
                         }}>{config.label}</span>
                       )}
                     </td>
-                    {canUploadDocs && (
-                      <td style={{ padding: "12px 16px" }}>
-                        <div style={{ display: "flex", gap: "6px", flexDirection: "column" }}>
-                          {app.offerLetter ? (
-                            <a href={app.offerLetter} target="_blank" rel="noopener noreferrer" style={{ fontSize: "11px", color: "#2E7D32", fontWeight: "600" }}>Offer Letter ✅</a>
-                          ) : (
-                            <label style={{ fontSize: "11px", color: "#DDBA52", fontWeight: "600", cursor: "pointer" }}>
-                              {uploading === `${app.id}-offerLetter` ? "..." : "Upload Offer Letter"}
-                              <input type="file" style={{ display: "none" }} onChange={(e) => e.target.files?.[0] && handleUploadDoc(app.id, "offerLetter", e.target.files[0])} />
-                            </label>
-                          )}
-                          {app.finalAdmission ? (
-                            <a href={app.finalAdmission} target="_blank" rel="noopener noreferrer" style={{ fontSize: "11px", color: "#1B5E20", fontWeight: "600" }}>Final Admission ✅</a>
-                          ) : (
-                            <label style={{ fontSize: "11px", color: "#DDBA52", fontWeight: "600", cursor: "pointer" }}>
-                              {uploading === `${app.id}-finalAdmission` ? "..." : "Upload Final Admission"}
-                              <input type="file" style={{ display: "none" }} onChange={(e) => e.target.files?.[0] && handleUploadDoc(app.id, "finalAdmission", e.target.files[0])} />
-                            </label>
-                          )}
-                        </div>
-                      </td>
-                    )}
+                    <td style={{ padding: "12px 16px" }}>
+                      <div style={{ display: "flex", gap: "6px", flexDirection: "column" }}>
+                        {/* Offer Letter */}
+                        {app.offerLetter ? (
+                          <a href={app.offerLetter} target="_blank" rel="noopener noreferrer" download style={{
+                            fontSize: "11px", color: "#2E7D32", fontWeight: "600",
+                            textDecoration: "none", display: "flex", alignItems: "center", gap: "4px",
+                          }}>📄 Offer Letter ✅</a>
+                        ) : canUploadDocs && app.status === "OFFER_LETTER" ? (
+                          <label style={{ fontSize: "11px", color: "#DDBA52", fontWeight: "600", cursor: "pointer" }}>
+                            {uploading === `${app.id}-offerLetter` ? "Upload..." : "📤 Upload Offer Letter (PDF)"}
+                            <input type="file" accept=".pdf" style={{ display: "none" }} onChange={(e) => e.target.files?.[0] && handleUploadDoc(app.id, "offerLetter", e.target.files[0])} />
+                          </label>
+                        ) : (
+                          <span style={{ fontSize: "11px", color: "#ccc" }}>Offer Letter: en attente</span>
+                        )}
+
+                        {/* Final Admission */}
+                        {app.finalAdmission ? (
+                          <a href={app.finalAdmission} target="_blank" rel="noopener noreferrer" download style={{
+                            fontSize: "11px", color: "#1B5E20", fontWeight: "600",
+                            textDecoration: "none", display: "flex", alignItems: "center", gap: "4px",
+                          }}>📄 Final Admission ✅</a>
+                        ) : canUploadDocs && app.status === "FINAL_ADMISSION" ? (
+                          <label style={{ fontSize: "11px", color: "#DDBA52", fontWeight: "600", cursor: "pointer" }}>
+                            {uploading === `${app.id}-finalAdmission` ? "Upload..." : "📤 Upload Final Admission (PDF)"}
+                            <input type="file" accept=".pdf" style={{ display: "none" }} onChange={(e) => e.target.files?.[0] && handleUploadDoc(app.id, "finalAdmission", e.target.files[0])} />
+                          </label>
+                        ) : (
+                          <span style={{ fontSize: "11px", color: "#ccc" }}>Final Admission: en attente</span>
+                        )}
+                      </div>
+                    </td>
                   </tr>
                 );
               })

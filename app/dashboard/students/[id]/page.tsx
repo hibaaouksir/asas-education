@@ -26,7 +26,21 @@ export default async function StudentDetailPage({ params }: { params: Promise<{ 
 
   const app = student.applications[0];
 
-  // Check if info is incomplete (converted from lead)
+  // Get desired program info if set
+  let desiredProgram = null;
+  if (student.desiredProgramId) {
+    desiredProgram = await prisma.program.findUnique({
+      where: { id: student.desiredProgramId },
+      include: { university: { include: { city: { include: { country: true } } } } },
+    });
+  }
+
+  // Get all programs for the selector
+  const programs = canEditInfo ? await prisma.program.findMany({
+    include: { university: { include: { city: { include: { country: true } } } } },
+    orderBy: { university: { name: "asc" } },
+  }) : [];
+
   const infoIncomplete = !student.passportNumber || !student.citizenship || !student.guardianName || student.dateOfBirth.toISOString().startsWith("2000-01-01");
 
   return (
@@ -55,7 +69,6 @@ export default async function StudentDetailPage({ params }: { params: Promise<{ 
       )}
 
       <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "20px", marginBottom: "20px" }}>
-        {/* Info section - editable if canEditInfo */}
         {canEditInfo ? (
           <EditStudentInfo
             studentId={student.id}
@@ -70,7 +83,15 @@ export default async function StudentDetailPage({ params }: { params: Promise<{ 
               citizenship: student.citizenship,
               guardianName: student.guardianName,
               guardianEmail: student.guardianEmail,
+              desiredProgramId: student.desiredProgramId || "",
             }}
+            programs={programs.map(p => ({
+              id: p.id,
+              name: p.name,
+              degree: p.degree,
+              universityName: p.university.name,
+              countryName: p.university.city.country.name,
+            }))}
           />
         ) : (
           <div style={{ backgroundColor: "white", padding: "24px", borderRadius: "12px", boxShadow: "0 2px 8px rgba(0,0,0,0.04)" }}>
@@ -114,8 +135,17 @@ export default async function StudentDetailPage({ params }: { params: Promise<{ 
               <p style={{ fontSize: "13px", color: "#888", margin: "0 0 4px" }}>Langue: {app.program.language} | Duree: {app.program.duration} ans</p>
               {app.program.pricePerYear && <p style={{ fontSize: "14px", fontWeight: "600", color: "#DDBA52", margin: "8px 0 0" }}>{app.program.pricePerYear} {app.program.currency}/an</p>}
             </div>
+          ) : desiredProgram ? (
+            <div style={{ padding: "16px", backgroundColor: "#F8F9FA", borderRadius: "8px" }}>
+              <p style={{ fontSize: "16px", fontWeight: "700", color: "#001459", margin: "0 0 8px" }}>{desiredProgram.university.name}</p>
+              <p style={{ fontSize: "14px", color: "#666", margin: "0 0 4px" }}>{desiredProgram.name} ({desiredProgram.degree})</p>
+              <p style={{ fontSize: "13px", color: "#888", margin: "0 0 4px" }}>{desiredProgram.university.city.name}, {desiredProgram.university.city.country.name}</p>
+              <p style={{ fontSize: "13px", color: "#888", margin: "0 0 4px" }}>Langue: {desiredProgram.language} | Duree: {desiredProgram.duration} ans</p>
+              {desiredProgram.pricePerYear && <p style={{ fontSize: "14px", fontWeight: "600", color: "#DDBA52", margin: "8px 0 0" }}>{desiredProgram.pricePerYear} {desiredProgram.currency}/an</p>}
+              <p style={{ fontSize: "11px", color: "#E65100", marginTop: "8px", fontStyle: "italic" }}>Programme souhaite (candidature pas encore envoyee)</p>
+            </div>
           ) : (
-            <p style={{ color: "#888", fontSize: "14px" }}>Aucun programme selectionne</p>
+            <p style={{ color: "#888", fontSize: "14px" }}>Aucun programme selectionne. Choisissez un programme dans le formulaire a gauche.</p>
           )}
 
           <h3 style={{ color: "#001459", fontSize: "16px", fontWeight: "700", margin: "24px 0 12px" }}>Agent / Consultant</h3>

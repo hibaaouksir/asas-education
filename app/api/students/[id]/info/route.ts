@@ -19,6 +19,7 @@ export async function PUT(request: Request, { params }: { params: Promise<{ id: 
         citizenship: body.citizenship,
         guardianName: body.guardianName,
         guardianEmail: body.guardianEmail,
+        desiredProgramId: body.desiredProgramId || null,
       },
     });
 

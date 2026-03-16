@@ -48,14 +48,21 @@ export default function LeadTable({ leads, consultants, isAdmin }: { leads: Lead
   const handleConvertToStudent = async (lead: Lead) => {
     setConverting(lead.id);
     try {
-      await fetch("/api/leads/convert", {
+      const res = await fetch("/api/leads/convert", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ leadId: lead.id }),
       });
-      router.refresh();
+      const data = await res.json();
+      if (res.ok) {
+        window.alert("Lead converti en etudiant avec succes ! Allez dans Etudiants pour completer ses informations et documents.");
+        router.refresh();
+      } else {
+        window.alert("Erreur: " + (data.error || "Erreur inconnue"));
+      }
     } catch (err) {
       console.error(err);
+      window.alert("Erreur de connexion au serveur");
     }
     setConverting("");
   };
@@ -67,6 +74,7 @@ export default function LeadTable({ leads, consultants, isAdmin }: { leads: Lead
     QUALIFIED: leads.filter(l => l.status === "QUALIFIED").length,
     APPOINTMENT: leads.filter(l => l.status === "APPOINTMENT").length,
     DEAL: leads.filter(l => l.status === "DEAL").length,
+    NOT_INTERESTED: leads.filter(l => l.status === "NOT_INTERESTED").length,
   };
 
   return (
@@ -118,7 +126,7 @@ export default function LeadTable({ leads, consultants, isAdmin }: { leads: Lead
                     <td style={{ padding: "12px 16px", fontSize: "13px", color: "#666" }}>{lead.email}</td>
                     <td style={{ padding: "12px 16px", fontSize: "13px", color: "#666" }}>{lead.city}</td>
                     <td style={{ padding: "12px 16px", fontSize: "13px", color: "#666" }}>{lead.educationLevel}</td>
-                    <td style={{ padding: "12px 16px", fontSize: "12px", color: "#888" }}>{lead.source.replace("_", " ")}</td>
+                    <td style={{ padding: "12px 16px", fontSize: "12px", color: "#888" }}>{lead.source}</td>
                     {isAdmin && (
                       <td style={{ padding: "12px 16px" }}>
                         <select value={lead.consultantId} onChange={(e) => handleAssign(lead.id, e.target.value)} style={{
@@ -148,7 +156,7 @@ export default function LeadTable({ leads, consultants, isAdmin }: { leads: Lead
                           backgroundColor: "#DDBA52", color: "#001459", fontSize: "11px",
                           fontWeight: "700", cursor: "pointer",
                           opacity: converting === lead.id ? 0.7 : 1,
-                        }}>{converting === lead.id ? "..." : "→ Etudiant"}</button>
+                        }}>{converting === lead.id ? "..." : "Convertir"}</button>
                       )}
                     </td>
                   </tr>

@@ -17,6 +17,7 @@ const statusConfig: Record<string, { label: string; bg: string; color: string }>
   QUALIFIED: { label: "Qualified", bg: "#F3E5F5", color: "#7B1FA2" },
   APPOINTMENT: { label: "Appointment", bg: "#E8F5E9", color: "#2E7D32" },
   DEAL: { label: "Deal", bg: "#FFEBEE", color: "#C62828" },
+  NOT_INTERESTED: { label: "Not Interested", bg: "#F5F5F5", color: "#888" },
 };
 
 export default function LeadTable({ leads, consultants, isAdmin }: { leads: Lead[]; consultants: Consultant[]; isAdmin: boolean }) {

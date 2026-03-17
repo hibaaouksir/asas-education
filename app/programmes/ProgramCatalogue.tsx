@@ -30,7 +30,7 @@ export default function ProgramCatalogue({ programs, countries }: { programs: Pr
 
   const filtered = programs.filter(p => {
     if (search && !p.name.toLowerCase().includes(search.toLowerCase()) && !p.universityName.toLowerCase().includes(search.toLowerCase()) && !p.department.toLowerCase().includes(search.toLowerCase())) return false;
-    if (countryFilter && p.countryName !== countryFilter) return false;
+    if (countryFilter && p.countryName.toLowerCase() !== countryFilter.toLowerCase()) return false;
     if (universityFilter && p.universityName !== universityFilter) return false;
     if (degreeFilter && p.degree !== degreeFilter) return false;
     if (languageFilter && p.language !== languageFilter) return false;

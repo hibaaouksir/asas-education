@@ -369,15 +369,11 @@ function AboutSection() {
 }
 
 function DestinationsSection() {
-  const destinations = [
-    { country: "Turquie", flag: "🇹🇷", universities: "50+" },
-    { country: "Allemagne", flag: "🇩🇪", universities: "20+" },
-    { country: "Hongrie", flag: "🇭🇺", universities: "15+" },
-    { country: "Malaisie", flag: "🇲🇾", universities: "10+" },
-    { country: "Emirats Arabes Unis", flag: "🇦🇪", universities: "12+" },
-    { country: "Chypre du Nord", flag: "🇨🇾", universities: "8+" },
-  ];
-
+  const [destinations, setDestinations] = useState<{id: string; name: string; code: string; universityCount: number}[]>([]);
+  useEffect(() => {
+    fetch("/api/public/countries").then(r => r.json()).then(data => setDestinations(data)).catch(() => {});
+  }, []);
+  if (destinations.length === 0) return null;
   return (
     <section style={{ padding: "100px 48px", background: "linear-gradient(160deg, #001459 0%, #000B2E 100%)" }}>
       <div style={{ maxWidth: "1200px", margin: "0 auto" }}>
@@ -387,8 +383,8 @@ function DestinationsSection() {
           <p style={{ color: "rgba(255,255,255,0.45)", fontSize: "15px" }}>Des opportunites dans les meilleurs pays du monde</p>
         </div>
         <div style={{ display: "grid", gridTemplateColumns: "repeat(3, 1fr)", gap: "20px" }}>
-          {destinations.map((dest, i) => (
-            <Link key={i} href="/destinations" style={{
+          {destinations.map((dest) => (
+            <Link key={dest.id} href={`/destinations/${dest.code.toLowerCase()}`} style={{
               background: "rgba(255,255,255,0.04)", border: "1px solid rgba(255,255,255,0.08)",
               borderRadius: "14px", padding: "28px", textDecoration: "none",
               transition: "all 0.4s", display: "flex", alignItems: "center", gap: "18px",
@@ -396,10 +392,10 @@ function DestinationsSection() {
               onMouseEnter={(e) => { e.currentTarget.style.background = "rgba(221,186,82,0.08)"; e.currentTarget.style.borderColor = "rgba(221,186,82,0.3)"; e.currentTarget.style.transform = "translateY(-4px)"; }}
               onMouseLeave={(e) => { e.currentTarget.style.background = "rgba(255,255,255,0.04)"; e.currentTarget.style.borderColor = "rgba(255,255,255,0.08)"; e.currentTarget.style.transform = "translateY(0)"; }}
             >
-              <span style={{ fontSize: "44px" }}>{dest.flag}</span>
+              <img src={`https://flagcdn.com/48x36/${dest.code.toLowerCase()}.png`} alt={dest.name} style={{ borderRadius: "4px", width: "48px", height: "36px" }} />
               <div>
-                <div style={{ color: "white", fontSize: "17px", fontWeight: "700", marginBottom: "4px" }}>{dest.country}</div>
-                <div style={{ color: "rgba(255,255,255,0.4)", fontSize: "13px" }}>{dest.universities} universites</div>
+                <div style={{ color: "white", fontSize: "17px", fontWeight: "700", marginBottom: "4px" }}>{dest.name}</div>
+                <div style={{ color: "rgba(255,255,255,0.4)", fontSize: "13px" }}>{dest.universityCount} universite{dest.universityCount !== 1 ? "s" : ""}</div>
               </div>
             </Link>
           ))}

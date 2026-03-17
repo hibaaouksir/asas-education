@@ -16,7 +16,8 @@ export default function ProgramCatalogue({ programs, countries }: { programs: Pr
   const searchParams = useSearchParams();
 
   const [search, setSearch] = useState("");
-  const [countryFilter, setCountryFilter] = useState(searchParams.get("pays") || "");
+  const paysParam = searchParams.get("pays") || "";
+const [countryFilter, setCountryFilter] = useState(countries.find(c => c.name.toLowerCase() === paysParam.toLowerCase())?.name || paysParam);
   const [universityFilter, setUniversityFilter] = useState(searchParams.get("universite") || "");
   const [degreeFilter, setDegreeFilter] = useState("");
   const [languageFilter, setLanguageFilter] = useState("");

@@ -37,9 +37,9 @@ export default function Footer() {
         <div>
           <h4 style={{ color: "#DDBA52", fontSize: "16px", marginBottom: "16px" }}>Contact</h4>
           <div style={{ display: "flex", flexDirection: "column", gap: "8px", fontSize: "14px", color: "#ccc" }}>
-            <span>Email: contact@asasforeducation.com</span>
-            <span>Phone: +212 6 00 00 00 00</span>
-            <span>Meknes, Morocco</span>
+            <span>Contact@asasforeducation.com</span>
+            <span>Av atlas, imm 19, appt 7</span>
+            <span>Agdal, Rabat</span>
           </div>
         </div>
       </div>

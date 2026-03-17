@@ -32,8 +32,8 @@ export default async function UniversitesPublicPage() {
                   backgroundColor: "white", borderRadius: "16px", overflow: "hidden",
                   boxShadow: "0 2px 12px rgba(0,0,0,0.06)", transition: "transform 0.2s, box-shadow 0.2s",
                 }}
-                  onMouseEnter={(e) => { (e.currentTarget as HTMLDivElement).style.transform = "translateY(-4px)"; (e.currentTarget as HTMLDivElement).style.boxShadow = "0 8px 24px rgba(0,0,0,0.12)"; }}
-                  onMouseLeave={(e) => { (e.currentTarget as HTMLDivElement).style.transform = "translateY(0)"; (e.currentTarget as HTMLDivElement).style.boxShadow = "0 2px 12px rgba(0,0,0,0.06)"; }}
+          
+                  
                 >
                   {uni.photo ? (
                     <img src={uni.photo} alt={uni.name} style={{ width: "100%", height: "200px", objectFit: "cover" }} />

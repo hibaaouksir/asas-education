@@ -52,6 +52,7 @@ enum LeadStatus {
   QUALIFIED
   APPOINTMENT
   DEAL
+  NOT_INTERESTED
 }
 
 model Lead {
@@ -250,6 +251,7 @@ model Blog {
   coverImage  String?
   tags        BlogTag[]
   isPublished Boolean  @default(false)
+  views       Int       @default(0)
 
   authorId    String
   author      User     @relation(fields: [authorId], references: [id])

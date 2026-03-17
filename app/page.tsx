@@ -410,6 +410,26 @@ function BookingSection() {
     firstName: "", lastName: "", email: "", phone: "", city: "", level: "", sessionType: "online",
   });
   const handleChange = (field: string, value: string) => setFormData((prev) => ({ ...prev, [field]: value }));
+  const [bookingLoading, setBookingLoading] = useState(false);
+  const [bookingDone, setBookingDone] = useState(false);
+  const handleBookingSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    setBookingLoading(true);
+    try {
+      await fetch("/api/leads", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          firstName: formData.firstName, lastName: formData.lastName,
+          email: formData.email, phone: formData.phone,
+          city: formData.city, educationLevel: formData.level,
+          sessionType: formData.sessionType, sourceName: "Site Web",
+        }),
+      });
+      setBookingDone(true);
+    } catch (err) { console.error(err); }
+    setBookingLoading(false);
+  };
 
   const inputStyle = {
     width: "100%", padding: "13px 16px", border: "1px solid #E0E0E0",
@@ -427,7 +447,7 @@ function BookingSection() {
           </h2>
           <p style={{ color: "#888", fontSize: "14px" }}>30 minutes de consultation individuelle — en ligne ou dans nos bureaux</p>
         </div>
-        <form style={{
+        <form onSubmit={handleBookingSubmit} style={{
           backgroundColor: "white", padding: "36px", borderRadius: "16px",
           boxShadow: "0 8px 40px rgba(0,0,0,0.06)", border: "1px solid #F0F0F0",
         }}>
@@ -480,13 +500,14 @@ function BookingSection() {
               ))}
             </div>
           </div>
-          <button type="submit" style={{
+          <button type="submit" disabled={bookingLoading} style={{
             width: "100%", padding: "15px",
-            background: "linear-gradient(135deg, #DDBA52, #C4A243)",
-            color: "#001459", border: "none", borderRadius: "10px",
+            background: bookingDone ? "#E8F5E9" : "linear-gradient(135deg, #DDBA52, #C4A243)",
+            color: bookingDone ? "#2E7D32" : "#001459", border: "none", borderRadius: "10px",
             fontSize: "15px", fontWeight: "700", cursor: "pointer",
             boxShadow: "0 4px 20px rgba(221,186,82,0.3)", transition: "all 0.3s",
-          }}>Reserver ma consultation gratuite</button>
+            opacity: bookingLoading ? 0.7 : 1,
+          }}>{bookingLoading ? "Envoi..." : bookingDone ? "✅ Demande envoyee avec succes !" : "Reserver ma consultation gratuite"}</button>
         </form>
       </div>
     </section>

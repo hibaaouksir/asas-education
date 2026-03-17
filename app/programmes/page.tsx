@@ -1,4 +1,5 @@
 import { prisma } from "@/lib/prisma";
+import { Suspense } from "react";
 import Navbar from "../components/Navbar";
 import Footer from "../components/Footer";
 import ProgramCatalogue from "./ProgramCatalogue";
@@ -24,24 +25,27 @@ export default async function ProgrammesPage() {
         </p>
       </section>
 
-      <ProgramCatalogue
-        programs={programs.map(p => ({
-          id: p.id,
-          name: p.name,
-          department: p.department,
-          degree: p.degree,
-          language: p.language,
-          duration: p.duration,
-          pricePerYear: p.pricePerYear,
-          currency: p.currency,
-          universityName: p.university.name,
-          universityPhoto: p.university.photo,
-          cityName: p.university.city.name,
-          countryName: p.university.city.country.name,
-          countryCode: p.university.city.country.code,
-        }))}
-        countries={countries.map(c => ({ name: c.name, code: c.code }))}
-      />
+      <Suspense fallback={<div style={{ padding: "40px", textAlign: "center" }}>Chargement...</div>}>
+        <ProgramCatalogue
+          programs={programs.map(p => ({
+            id: p.id,
+            universityId: p.universityId,
+            name: p.name,
+            department: p.department,
+            degree: p.degree,
+            language: p.language,
+            duration: p.duration,
+            pricePerYear: p.pricePerYear,
+            currency: p.currency,
+            universityName: p.university.name,
+            universityPhoto: p.university.photo,
+            cityName: p.university.city.name,
+            countryName: p.university.city.country.name,
+            countryCode: p.university.city.country.code,
+          }))}
+          countries={countries.map(c => ({ name: c.name, code: c.code }))}
+        />
+      </Suspense>
 
       <Footer />
     </div>

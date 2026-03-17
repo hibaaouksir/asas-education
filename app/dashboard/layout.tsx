@@ -13,7 +13,7 @@ export default async function DashboardLayout({ children }: { children: React.Re
   const menuItems = [
     { label: "Dashboard", href: "/dashboard", icon: "📊", roles: ["ADMIN", "APPLICATION", "CONSULTANT", "SUB_AGENT"] },
     { label: "Leads", href: "/dashboard/leads", icon: "📋", roles: ["ADMIN", "CONSULTANT"] },
-    { label: "Etudiants", href: "/dashboard/students", icon: "🎓", roles: ["ADMIN", "APPLICATION", "CONSULTANT", "SUB_AGENT"] },
+    { label: "Etudiants", href: "/dashboard/students", icon: "🎓", roles: ["ADMIN", "CONSULTANT", "SUB_AGENT"] },
     { label: "Candidatures", href: "/dashboard/applications", icon: "📄", roles: ["ADMIN", "APPLICATION", "CONSULTANT", "SUB_AGENT"] },
     { label: "Utilisateurs", href: "/dashboard/users", icon: "👥", roles: ["ADMIN"] },
     { label: "Pays", href: "/dashboard/countries", icon: "🌍", roles: ["ADMIN"] },

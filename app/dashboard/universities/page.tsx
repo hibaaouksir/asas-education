@@ -8,6 +8,10 @@ export default async function UniversitiesPage() {
   const session = await auth();
   const role = session?.user?.role;
   const canEdit = role === "ADMIN";
+  const cities = await prisma.city.findMany({
+    include: { country: true },
+    orderBy: { name: "asc" },
+  });
 
   const universities = await prisma.university.findMany({
     orderBy: { name: "asc" },
@@ -25,7 +29,7 @@ export default async function UniversitiesPage() {
         </h1>
       </div>
 
-      {canEdit && <UniversityForm />}
+      {canEdit && <UniversityForm cities={cities.map(c => ({ id: c.id, name: c.name, countryName: c.country.name }))} />}
 
       <div style={{ backgroundColor: "white", borderRadius: "12px", boxShadow: "0 2px 8px rgba(0,0,0,0.04)", overflow: "hidden", marginTop: "24px" }}>
         <table style={{ width: "100%", borderCollapse: "collapse" }}>

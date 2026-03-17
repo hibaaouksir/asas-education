@@ -40,6 +40,8 @@ export async function POST(request: Request) {
         status: "EN_ATTENTE",
       },
     });
+    // Remove lead from leads table after conversion
+    await prisma.lead.delete({ where: { id: lead.id } });
 
     return NextResponse.json({ studentId: student.id }, { status: 201 });
   } catch (error) {

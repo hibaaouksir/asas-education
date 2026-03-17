@@ -41,6 +41,7 @@ export default function ApplicationTable({ applications, isAdmin, role }: { appl
   const getAllowedStatuses = () => {
     if (role === "ADMIN") return Object.keys(statusConfig);
     if (role === "APPLICATION") return ["APPLIED", "RECEIVED", "OFFER_LETTER", "FINAL_ADMISSION"];
+
     return [];
   };
 
@@ -151,10 +152,19 @@ export default function ApplicationTable({ applications, isAdmin, role }: { appl
                           ))}
                         </select>
                       ) : (
-                        <span style={{
-                          padding: "4px 12px", borderRadius: "20px", fontSize: "12px",
-                          fontWeight: "600", backgroundColor: config.bg, color: config.color,
-                        }}>{config.label}</span>
+                        <div style={{ display: "flex", alignItems: "center", gap: "6px" }}>
+                          <span style={{
+                            padding: "4px 12px", borderRadius: "20px", fontSize: "12px",
+                            fontWeight: "600", backgroundColor: config.bg, color: config.color,
+                          }}>{config.label}</span>
+                          {role === "CONSULTANT" && app.status === "OFFER_LETTER" && (
+                            <button onClick={() => handleStatusChange(app.id, "PAID")} style={{
+                              padding: "4px 10px", borderRadius: "6px", border: "1px solid #2E7D32",
+                              backgroundColor: "transparent", color: "#2E7D32", fontSize: "10px",
+                              fontWeight: "700", cursor: "pointer",
+                            }}>Marquer Paye</button>
+                          )}
+                        </div>
                       )}
                     </td>
                     <td style={{ padding: "12px 16px" }}>

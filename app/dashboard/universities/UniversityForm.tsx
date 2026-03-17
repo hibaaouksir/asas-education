@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useRef, useEffect } from "react";
 import { useRouter } from "next/navigation";
 
 type CityOption = { id: string; name: string; countryName: string };
@@ -12,6 +12,33 @@ export default function UniversityForm({ cities }: { cities: CityOption[] }) {
   const [imageUrl, setImageUrl] = useState("");
   const [uploading, setUploading] = useState(false);
   const [form, setForm] = useState({ name: "", cityId: "", website: "", description: "" });
+
+  // City search state
+  const [citySearch, setCitySearch] = useState("");
+  const [showCityDropdown, setShowCityDropdown] = useState(false);
+  const cityRef = useRef<HTMLDivElement>(null);
+
+  const filteredCities = cities.filter(c =>
+    c.name.toLowerCase().includes(citySearch.toLowerCase()) ||
+    c.countryName.toLowerCase().includes(citySearch.toLowerCase())
+  );
+
+  // Close dropdown when clicking outside
+  useEffect(() => {
+    const handleClick = (e: MouseEvent) => {
+      if (cityRef.current && !cityRef.current.contains(e.target as Node)) {
+        setShowCityDropdown(false);
+      }
+    };
+    document.addEventListener("mousedown", handleClick);
+    return () => document.removeEventListener("mousedown", handleClick);
+  }, []);
+
+  const handleCitySelect = (city: CityOption) => {
+    setForm({ ...form, cityId: city.id });
+    setCitySearch(`${city.name} (${city.countryName})`);
+    setShowCityDropdown(false);
+  };
 
   const handleImageUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
@@ -35,6 +62,7 @@ export default function UniversityForm({ cities }: { cities: CityOption[] }) {
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+    if (!form.cityId) { window.alert("Selectionnez une ville"); return; }
     setLoading(true);
     try {
       const res = await fetch("/api/universities", {
@@ -45,6 +73,7 @@ export default function UniversityForm({ cities }: { cities: CityOption[] }) {
       if (res.ok) {
         setForm({ name: "", cityId: "", website: "", description: "" });
         setImageUrl("");
+        setCitySearch("");
         setOpen(false);
         router.refresh();
       }
@@ -58,6 +87,8 @@ export default function UniversityForm({ cities }: { cities: CityOption[] }) {
     width: "100%", padding: "10px 14px", border: "1px solid #ddd",
     borderRadius: "8px", fontSize: "14px", boxSizing: "border-box" as const, outline: "none",
   };
+
+  const labelStyle = { display: "block", marginBottom: "4px", fontSize: "12px", color: "#666", fontWeight: "600" as const };
 
   if (!open) {
     return (
@@ -84,29 +115,55 @@ export default function UniversityForm({ cities }: { cities: CityOption[] }) {
       <form onSubmit={handleSubmit}>
         <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "12px", marginBottom: "12px" }}>
           <div>
-            <label style={{ display: "block", marginBottom: "4px", fontSize: "12px", color: "#666", fontWeight: "600" }}>Nom *</label>
+            <label style={labelStyle}>Nom *</label>
             <input required style={inputStyle} placeholder="Ex: Medipol University" value={form.name} onChange={(e) => setForm({ ...form, name: e.target.value })} />
           </div>
-          <div>
-            <label style={{ display: "block", marginBottom: "4px", fontSize: "12px", color: "#666", fontWeight: "600" }}>Ville *</label>
-            <select required style={{ ...inputStyle, cursor: "pointer" }} value={form.cityId} onChange={(e) => setForm({ ...form, cityId: e.target.value })}>
-              <option value="">Selectionnez une ville</option>
-              {cities.map((city) => (
-                <option key={city.id} value={city.id}>{city.name} ({city.countryName})</option>
-              ))}
-            </select>
+          <div ref={cityRef} style={{ position: "relative" }}>
+            <label style={labelStyle}>Ville *</label>
+            <input
+              style={inputStyle}
+              placeholder="Rechercher une ville..."
+              value={citySearch}
+              onChange={(e) => {
+                setCitySearch(e.target.value);
+                setForm({ ...form, cityId: "" });
+                setShowCityDropdown(true);
+              }}
+              onFocus={() => setShowCityDropdown(true)}
+            />
+            {showCityDropdown && (
+              <div style={{
+                position: "absolute", top: "100%", left: 0, right: 0, marginTop: "4px",
+                backgroundColor: "white", borderRadius: "8px", boxShadow: "0 4px 16px rgba(0,0,0,0.15)",
+                zIndex: 100, maxHeight: "200px", overflowY: "auto", border: "1px solid #ddd",
+              }}>
+                {filteredCities.length === 0 ? (
+                  <div style={{ padding: "12px 14px", color: "#888", fontSize: "13px" }}>Aucune ville trouvee</div>
+                ) : (
+                  filteredCities.map((city) => (
+                    <button key={city.id} type="button" onClick={() => handleCitySelect(city)} style={{
+                      display: "block", width: "100%", padding: "10px 14px", border: "none",
+                      backgroundColor: form.cityId === city.id ? "#F0F0F0" : "white",
+                      color: "#001459", fontSize: "13px", cursor: "pointer", textAlign: "left",
+                    }}>
+                      {city.name} <span style={{ color: "#888" }}>({city.countryName})</span>
+                    </button>
+                  ))
+                )}
+              </div>
+            )}
           </div>
         </div>
         <div style={{ marginBottom: "12px" }}>
-          <label style={{ display: "block", marginBottom: "4px", fontSize: "12px", color: "#666", fontWeight: "600" }}>Site web</label>
+          <label style={labelStyle}>Site web</label>
           <input style={inputStyle} placeholder="https://www.example.com" value={form.website} onChange={(e) => setForm({ ...form, website: e.target.value })} />
         </div>
         <div style={{ marginBottom: "12px" }}>
-          <label style={{ display: "block", marginBottom: "4px", fontSize: "12px", color: "#666", fontWeight: "600" }}>Description</label>
+          <label style={labelStyle}>Description</label>
           <textarea style={{ ...inputStyle, minHeight: "80px", resize: "vertical" }} placeholder="Description de l universite..." value={form.description} onChange={(e) => setForm({ ...form, description: e.target.value })} />
         </div>
         <div style={{ marginBottom: "16px" }}>
-          <label style={{ display: "block", marginBottom: "4px", fontSize: "12px", color: "#666", fontWeight: "600" }}>Photo de l universite</label>
+          <label style={labelStyle}>Photo de l universite</label>
           <input type="file" accept="image/*" onChange={handleImageUpload} style={{ fontSize: "14px" }} />
           {uploading && <p style={{ color: "#DDBA52", fontSize: "13px", marginTop: "6px" }}>Upload en cours...</p>}
           {imageUrl && (

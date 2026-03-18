@@ -7,7 +7,7 @@ export async function PUT(request: Request, { params }: { params: Promise<{ id: 
     const body = await request.json();
     const { field, url } = body;
 
-    const allowedFields = ["transcript", "passportFile", "diploma", "cv", "motivationLetter"];
+    const allowedFields = ["transcript", "passportFile", "diploma", "cv", "motivationLetter", "photo"];
     if (!allowedFields.includes(field)) {
       return NextResponse.json({ error: "Champ invalide" }, { status: 400 });
     }

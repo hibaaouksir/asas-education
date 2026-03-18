@@ -88,7 +88,16 @@ export default async function StudentsPage() {
                 const docsComplete = docs >= 2;
                 return (
                   <tr key={student.id} style={{ borderTop: "1px solid #F0F0F0" }}>
-                    <td style={{ padding: "12px 16px", fontSize: "14px", fontWeight: "600", color: "#001459" }}>{student.firstName} {student.lastName}</td>
+                    <td style={{ padding: "12px 16px" }}>
+                      <div style={{ display: "flex", alignItems: "center", gap: "10px" }}>
+                        {student.photo ? (
+                          <img src={student.photo} alt="" style={{ width: "36px", height: "36px", borderRadius: "50%", objectFit: "cover", border: "2px solid #DDBA52" }} />
+                        ) : (
+                          <div style={{ width: "36px", height: "36px", borderRadius: "50%", backgroundColor: "#F0F0F0", display: "flex", alignItems: "center", justifyContent: "center", fontSize: "14px", color: "#ccc" }}>👤</div>
+                        )}
+                        <span style={{ fontSize: "14px", fontWeight: "600", color: "#001459" }}>{student.firstName} {student.lastName}</span>
+                      </div>
+                    </td>
                     <td style={{ padding: "12px 16px", fontSize: "13px", color: "#666" }}>{student.email}</td>
                     <td style={{ padding: "12px 16px", fontSize: "13px", color: "#666" }}>{student.phone}</td>
                     <td style={{ padding: "12px 16px", fontSize: "13px", color: "#666" }}>{uniName}</td>

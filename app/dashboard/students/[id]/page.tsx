@@ -166,6 +166,7 @@ export default async function StudentDetailPage({ params }: { params: Promise<{ 
           diploma: student.diploma || "",
           cv: student.cv || "",
           motivationLetter: student.motivationLetter || "",
+          photo: student.photo || "",
         }}
       />
     </div>

@@ -119,6 +119,7 @@ model Student {
   languageProof   String?
   cv              String?
   motivationLetter String?
+  photo         String?
   additionalDocs  String[]
 
   acceptance      String?

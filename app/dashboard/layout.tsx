@@ -71,7 +71,10 @@ export default async function DashboardLayout({ children }: { children: React.Re
           </div>
           <LogoutButton />
         </header>
-        <div style={{ padding: "32px" }}>{children}</div>
+        <div style={{ padding: "32px" }}>
+          <Link href="/dashboard" style={{ display: "inline-flex", alignItems: "center", gap: "6px", color: "#888", textDecoration: "none", fontSize: "13px", marginBottom: "16px", fontWeight: "500" }}>← Tableau de bord</Link>
+          {children}
+        </div>
       </main>
     </div>
   );

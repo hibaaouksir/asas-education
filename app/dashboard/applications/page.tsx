@@ -38,6 +38,7 @@ export default async function ApplicationsPage() {
           id: a.id,
           studentName: `${a.student.firstName} ${a.student.lastName}`,
           studentEmail: a.student.email,
+          studentPhoto: a.student.photo || "",
           universityName: a.program.university.name,
           programName: a.program.name,
           department: a.program.department,

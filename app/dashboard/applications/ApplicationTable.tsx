@@ -4,7 +4,7 @@ import { useState } from "react";
 import { useRouter } from "next/navigation";
 
 type Application = {
-  id: string; studentName: string; studentEmail: string;
+  id: string; studentName: string; studentEmail: string; studentPhoto: string;
   universityName: string; programName: string; department: string;
   degree: string; language: string; countryName: string;
   status: string; offerLetter: string; finalAdmission: string;
@@ -124,8 +124,17 @@ export default function ApplicationTable({ applications, isAdmin, role }: { appl
                 return (
                   <tr key={app.id} style={{ borderTop: "1px solid #F0F0F0" }}>
                     <td style={{ padding: "12px 16px" }}>
-                      <p style={{ fontSize: "14px", fontWeight: "600", color: "#001459", margin: "0 0 2px" }}>{app.studentName}</p>
-                      <p style={{ fontSize: "11px", color: "#888", margin: 0 }}>{app.studentEmail}</p>
+                      <div style={{ display: "flex", alignItems: "center", gap: "10px" }}>
+                        {app.studentPhoto ? (
+                          <img src={app.studentPhoto} alt="" style={{ width: "36px", height: "36px", borderRadius: "50%", objectFit: "cover", border: "2px solid #DDBA52" }} />
+                        ) : (
+                          <div style={{ width: "36px", height: "36px", borderRadius: "50%", backgroundColor: "#F0F0F0", display: "flex", alignItems: "center", justifyContent: "center", fontSize: "14px", color: "#ccc" }}>👤</div>
+                        )}
+                        <div>
+                          <p style={{ fontSize: "14px", fontWeight: "600", color: "#001459", margin: "0 0 2px" }}>{app.studentName}</p>
+                          <p style={{ fontSize: "11px", color: "#888", margin: 0 }}>{app.studentEmail}</p>
+                        </div>
+                      </div>
                     </td>
                     <td style={{ padding: "12px 16px", fontSize: "13px", color: "#666" }}>{app.universityName}</td>
                     <td style={{ padding: "12px 16px" }}>
@@ -157,7 +166,7 @@ export default function ApplicationTable({ applications, isAdmin, role }: { appl
                             padding: "4px 12px", borderRadius: "20px", fontSize: "12px",
                             fontWeight: "600", backgroundColor: config.bg, color: config.color,
                           }}>{config.label}</span>
-                          {role === "CONSULTANT" && app.status === "OFFER_LETTER" && (
+                          {(role === "CONSULTANT" || role === "SUB_AGENT") && app.status === "OFFER_LETTER" && (
                             <button onClick={() => handleStatusChange(app.id, "PAID")} style={{
                               padding: "4px 10px", borderRadius: "6px", border: "1px solid #2E7D32",
                               backgroundColor: "transparent", color: "#2E7D32", fontSize: "10px",

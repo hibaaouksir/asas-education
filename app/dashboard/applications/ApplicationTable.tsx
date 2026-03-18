@@ -40,7 +40,7 @@ export default function ApplicationTable({ applications, isAdmin, role }: { appl
 
   const getAllowedStatuses = () => {
     if (role === "ADMIN") return Object.keys(statusConfig);
-    if (role === "APPLICATION") return ["APPLIED", "RECEIVED", "OFFER_LETTER", "FINAL_ADMISSION"];
+    if (role === "APPLICATION") return ["APPLIED", "RECEIVED", "OFFER_LETTER", "PAID", "FINAL_ADMISSION"];
 
     return [];
   };

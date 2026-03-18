@@ -18,6 +18,7 @@ export default async function DashboardPage() {
     : await prisma.lead.count({ where: { consultantId: userId } });
   const consultantCount = role === "ADMIN" ? await prisma.user.count({ where: { role: "CONSULTANT" } }) : 0;
   const agentCount = role === "ADMIN" ? await prisma.user.count({ where: { role: "SUB_AGENT" } }) : 0;
+  const applicationCount = role === "ADMIN" ? await prisma.user.count({ where: { role: "APPLICATION" } }) : 0;
 
   const appCounts = (role === "ADMIN" || role === "APPLICATION") ? {
     applied: await prisma.studentApplication.count({ where: { status: "APPLIED" } }),
@@ -64,8 +65,7 @@ export default async function DashboardPage() {
           {[
             { label: "Leads", count: leadCount, color: "#DDBA52", href: "/dashboard/leads", icon: "📋", sub: "Demandes recues" },
             { label: "Etudiants", count: studentCount, color: "#001459", href: "/dashboard/students", icon: "🎓", sub: "Inscrits" },
-            { label: "Consultants", count: consultantCount, color: "#DD061A", href: "/dashboard/users", icon: "💼", sub: "Actifs" },
-            { label: "Agents", count: agentCount, color: "#DDBA52", href: "/dashboard/users", icon: "👥", sub: "Partenaires" },
+           { label: "Utilisateurs", count: consultantCount + agentCount + applicationCount, color: "#DD061A", href: "/dashboard/users", icon: "👥", sub: "Consultants, Agents & Application" },
             { label: "Universites", count: universityCount, color: "#001459", href: "/dashboard/universities", icon: "🏛", sub: "Partenaires" },
             { label: "Programmes", count: programCount, color: "#DD061A", href: "/dashboard/programs", icon: "📚", sub: "Disponibles" },
           ].map((stat, i) => (

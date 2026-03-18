@@ -41,7 +41,7 @@ export default async function StudentDetailPage({ params }: { params: Promise<{ 
     orderBy: { university: { name: "asc" } },
   }) : [];
 
-  const infoIncomplete = !student.passportNumber || !student.citizenship || !student.guardianName || student.dateOfBirth.toISOString().startsWith("2000-01-01");
+  const infoIncomplete = !student.passportNumber || student.passportNumber === "" || !student.citizenship || student.citizenship === "" || !student.guardianName || student.guardianName === "" || student.gender === "OTHER" || student.dateOfBirth.toISOString().startsWith("2000-01-01");
 
   return (
     <div>

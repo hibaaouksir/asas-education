@@ -85,7 +85,10 @@ export default async function StudentsPage() {
                 const docs = [student.transcript, student.passportFile, student.diploma, student.cv, student.motivationLetter].filter(Boolean).length;
                 const uniName = student.applications[0]?.program?.university?.name || "-";
                 const hasApplication = student.applications.length > 0;
-                const docsComplete = docs >= 2;
+                const hasPhoto = !!student.photo;
+                const infoComplete = !!student.passportNumber && student.passportNumber !== "" && !!student.citizenship && student.citizenship !== "" && !!student.guardianName && student.guardianName !== "" && student.gender !== "OTHER" && !student.dateOfBirth.toISOString().startsWith("2000-01-01");
+            
+                const docsComplete = docs >= 5 && hasPhoto && infoComplete;
                 return (
                   <tr key={student.id} style={{ borderTop: "1px solid #F0F0F0" }}>
                     <td style={{ padding: "12px 16px" }}>
@@ -121,7 +124,7 @@ export default async function StudentsPage() {
                         <span style={{ padding: "4px 12px", borderRadius: "12px", fontSize: "11px", fontWeight: "600", backgroundColor: "#E8F5E9", color: "#2E7D32" }}>Envoyee</span>
                       )}
                       {canApply && !hasApplication && !docsComplete && (
-                        <span style={{ fontSize: "10px", color: "#C62828", display: "block", marginTop: "4px" }}>Docs incomplets</span>
+                        <span style={{ fontSize: "10px", color: "#C62828", display: "block", marginTop: "4px" }}>{docs < 5 ? "Docs incomplets" : !hasPhoto ? "Photo manquante" : "Infos incompletes"}</span>
                       )}
                     </td>
                     <td style={{ padding: "12px 16px" }}>

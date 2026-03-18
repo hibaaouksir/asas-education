@@ -13,9 +13,13 @@ export default async function DashboardPage() {
   const programCount = await prisma.program.count();
   const universityCount = await prisma.university.count();
   const announcementCount = await prisma.announcement.count({ where: { isActive: true } });
-  const leadCount = role === "ADMIN" 
-    ? await prisma.lead.count() 
+  const currentUser = await prisma.user.findUnique({ where: { id: userId || "" }, select: { lastSeenLeads: true } });
+  const leadCount = role === "ADMIN"
+    ? await prisma.lead.count()
     : await prisma.lead.count({ where: { consultantId: userId } });
+  const newLeadCount = role === "ADMIN"
+    ? await prisma.lead.count({ where: { createdAt: { gt: currentUser?.lastSeenLeads || new Date(0) } } })
+    : 0;
   const consultantCount = role === "ADMIN" ? await prisma.user.count({ where: { role: "CONSULTANT" } }) : 0;
   const agentCount = role === "ADMIN" ? await prisma.user.count({ where: { role: "SUB_AGENT" } }) : 0;
   const applicationCount = role === "ADMIN" ? await prisma.user.count({ where: { role: "APPLICATION" } }) : 0;
@@ -63,7 +67,7 @@ export default async function DashboardPage() {
 
         <div style={{ display: "grid", gridTemplateColumns: "repeat(3, 1fr)", gap: "16px", marginBottom: "24px" }}>
           {[
-            { label: "Leads", count: leadCount, color: "#DDBA52", href: "/dashboard/leads", icon: "📋", sub: "Demandes recues" },
+            { label: "Leads", count: leadCount, color: newLeadCount > 0 ? "#2E7D32" : "#DDBA52", href: "/dashboard/leads", icon: "📋", sub: newLeadCount > 0 ? `+${newLeadCount} nouveaux` : "Demandes recues", isNew: newLeadCount > 0 },
             { label: "Etudiants", count: studentCount, color: "#001459", href: "/dashboard/students", icon: "🎓", sub: "Inscrits" },
            { label: "Utilisateurs", count: consultantCount + agentCount + applicationCount, color: "#DD061A", href: "/dashboard/users", icon: "👥", sub: "Consultants, Agents & Application" },
             { label: "Universites", count: universityCount, color: "#001459", href: "/dashboard/universities", icon: "🏛", sub: "Partenaires" },
@@ -71,9 +75,8 @@ export default async function DashboardPage() {
           ].map((stat, i) => (
             <Link key={i} href={stat.href} style={{ textDecoration: "none" }}>
               <div style={{
-                backgroundColor: "white", padding: "20px", borderRadius: "14px",
-                boxShadow: "0 1px 4px rgba(0,0,0,0.04)", borderLeft: `4px solid ${stat.color}`,
-                cursor: "pointer",
+                backgroundColor: (stat as any).isNew ? "#E8F5E9" : "white", padding: "20px", borderRadius: "14px",
+                boxShadow: (stat as any).isNew ? "0 2px 12px rgba(46,125,50,0.15)" : "0 1px 4px rgba(0,0,0,0.04)", borderLeft: `4px solid ${stat.color}`,
               }}>
                 <div style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-start" }}>
                   <div>

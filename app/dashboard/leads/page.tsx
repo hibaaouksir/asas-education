@@ -17,6 +17,9 @@ export default async function LeadsPage() {
     where: { role: "CONSULTANT", isActive: true },
     orderBy: { firstName: "asc" },
   }) : [];
+  if (userId) {
+    await prisma.user.update({ where: { id: userId }, data: { lastSeenLeads: new Date() } });
+  }
 
   return (
     <div>

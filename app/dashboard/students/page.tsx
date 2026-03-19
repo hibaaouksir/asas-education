@@ -18,6 +18,8 @@ export default async function StudentsPage() {
       include: {
         consultant: true,
         applications: { include: { program: { include: { university: true } } } },
+        desiredProgram: { include: { university: true } },
+       
       },
     });
     title = role === "ADMIN" ? "Tous les Etudiants" : "Etudiants";
@@ -28,6 +30,7 @@ export default async function StudentsPage() {
       include: {
         consultant: true,
         applications: { include: { program: { include: { university: true } } } },
+        desiredProgram: { include: { university: true } },
       },
     });
     title = "Mes Etudiants";
@@ -83,11 +86,11 @@ export default async function StudentsPage() {
             ) : (
               students.map((student) => {
                 const docs = [student.transcript, student.passportFile, student.diploma, student.cv, student.motivationLetter].filter(Boolean).length;
-                const uniName = student.applications[0]?.program?.university?.name || "-";
+                const uniName = student.applications[0]?.program?.university?.name || student.desiredProgram?.university?.name || "-";
                 const hasApplication = student.applications.length > 0;
                 const hasPhoto = !!student.photo;
                 const infoComplete = !!student.passportNumber && student.passportNumber !== "" && !!student.citizenship && student.citizenship !== "" && !!student.guardianName && student.guardianName !== "" && student.gender !== "OTHER" && !student.dateOfBirth.toISOString().startsWith("2000-01-01");
-            
+                
                 const docsComplete = docs >= 5 && hasPhoto && infoComplete;
                 return (
                   <tr key={student.id} style={{ borderTop: "1px solid #F0F0F0" }}>

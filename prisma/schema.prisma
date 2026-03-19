@@ -127,6 +127,7 @@ model Student {
   acceptance      String?
   status          String   @default("EN_ATTENTE")
   desiredProgramId String?
+  desiredProgram   Program? @relation("DesiredProgram", fields: [desiredProgramId], references: [id])
 
   consultantId    String?
   consultant      User?     @relation("ConsultantStudents", fields: [consultantId], references: [id])
@@ -226,6 +227,7 @@ model Program {
   university     University @relation(fields: [universityId], references: [id], onDelete: Cascade)
 
   applications   StudentApplication[]
+  desiredByStudents Student[] @relation("DesiredProgram")
 
   createdAt      DateTime @default(now())
   updatedAt      DateTime @updatedAt

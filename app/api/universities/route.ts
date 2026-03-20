@@ -10,6 +10,7 @@ export async function POST(request: Request) {
         cityId: body.cityId,
         website: body.website || null,
         description: body.description || null,
+        photo: body.photo || null,
       },
     });
     return NextResponse.json(university, { status: 201 });

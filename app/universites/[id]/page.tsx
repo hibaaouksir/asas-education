@@ -41,7 +41,7 @@ export default async function UniversityDetailPage({ params }: { params: Promise
       </section>
 
       <div style={{ maxWidth: "1200px", margin: "0 auto", padding: "40px 48px" }}>
-        <Link href="/programmes" style={{ color: "#888", textDecoration: "none", fontSize: "13px" }}>← Retour au catalogue</Link>
+        <Link href="/universites" style={{ color: "#888", textDecoration: "none", fontSize: "13px" }}>← Retour aux universites</Link>
 
         {/* University Info */}
         <div style={{ display: "grid", gridTemplateColumns: "2fr 1fr", gap: "32px", marginTop: "24px", marginBottom: "40px" }}>

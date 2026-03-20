@@ -385,7 +385,7 @@ function DestinationsSection() {
         </div>
         <div style={{ display: "grid", gridTemplateColumns: "repeat(3, 1fr)", gap: "20px" }}>
           {destinations.map((dest) => (
-            <Link key={dest.id} href={`/programmes?pays=${dest.name.toLowerCase()}`} style={{
+            <Link key={dest.id} href={`/universites?pays=${dest.name.toLowerCase()}`} style={{
               background: "rgba(255,255,255,0.04)", border: "1px solid rgba(255,255,255,0.08)",
               borderRadius: "14px", padding: "28px", textDecoration: "none",
               transition: "all 0.4s", display: "flex", alignItems: "center", gap: "18px",

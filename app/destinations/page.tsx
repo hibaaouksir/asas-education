@@ -40,7 +40,7 @@ export default async function DestinationsPage() {
         ) : (
           <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fill, minmax(300px, 1fr))", gap: "24px" }}>
             {countriesData.map((country) => (
-              <Link key={country.id} href={`/programmes?pays=${encodeURIComponent(country.name)}`} style={{ textDecoration: "none" }}>
+              <Link key={country.id} href={`/universites?pays=${encodeURIComponent(country.name)}`} style={{ textDecoration: "none" }}>
                 <div style={{
                   backgroundColor: "white", borderRadius: "16px", overflow: "hidden",
                   boxShadow: "0 2px 12px rgba(0,0,0,0.06)", transition: "transform 0.2s, box-shadow 0.2s",
@@ -61,7 +61,7 @@ export default async function DestinationsPage() {
                       <p style={{ color: "#001459", fontSize: "14px", fontWeight: "600", margin: "0 0 2px" }}>{country.universityCount} universite{country.universityCount !== 1 ? "s" : ""}</p>
                       <p style={{ color: "#888", fontSize: "12px", margin: 0 }}>{country.programCount} programme{country.programCount !== 1 ? "s" : ""}</p>
                     </div>
-                    <span style={{ color: "#DDBA52", fontSize: "14px", fontWeight: "600" }}>Voir les programmes →</span>
+                    <span style={{ color: "#DDBA52", fontSize: "14px", fontWeight: "600" }}>Voir les universités →</span>
                   </div>
                 </div>
               </Link>

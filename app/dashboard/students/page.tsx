@@ -19,7 +19,6 @@ export default async function StudentsPage() {
         consultant: true,
         applications: { include: { program: { include: { university: true } } } },
         desiredProgram: { include: { university: true } },
-       
       },
     });
     title = role === "ADMIN" ? "Tous les Etudiants" : "Etudiants";
@@ -89,20 +88,21 @@ export default async function StudentsPage() {
                 const uniName = student.applications[0]?.program?.university?.name || student.desiredProgram?.university?.name || "-";
                 const hasApplication = student.applications.length > 0;
                 const hasPhoto = !!student.photo;
-                const infoComplete = !!student.passportNumber && student.passportNumber !== "" && !!student.citizenship && student.citizenship !== "" && !!student.guardianName && student.guardianName !== "" && student.gender !== "OTHER" && !student.dateOfBirth.toISOString().startsWith("2000-01-01");
-                
-                const docsComplete = docs >= 5 && hasPhoto && infoComplete;
+                const hasTranscript = !!student.transcript;
+                const hasPassport = !!student.passportFile;
+                const infoComplete = !!student.firstName && student.firstName !== "" && !!student.lastName && student.lastName !== "" && !!student.email && student.email !== "" && !!student.phone && student.phone !== "" && !!student.passportNumber && student.passportNumber !== "" && !!student.citizenship && student.citizenship !== "" && !!student.guardianName && student.guardianName !== "" && !!student.guardianEmail && student.guardianEmail !== "" && student.gender !== "OTHER";
+                const docsComplete = hasTranscript && hasPassport && hasPhoto && infoComplete;
                 return (
                   <tr key={student.id} style={{ borderTop: "1px solid #F0F0F0" }}>
                     <td style={{ padding: "12px 16px" }}>
-                      <div style={{ display: "flex", alignItems: "center", gap: "10px" }}>
+                     <Link href={`/dashboard/students/${student.id}/profile`} style={{ display: "flex", alignItems: "center", gap: "10px", textDecoration: "none" }}>
                         {student.photo ? (
                           <img src={student.photo} alt="" style={{ width: "36px", height: "36px", borderRadius: "50%", objectFit: "cover", border: "2px solid #DDBA52" }} />
                         ) : (
                           <div style={{ width: "36px", height: "36px", borderRadius: "50%", backgroundColor: "#F0F0F0", display: "flex", alignItems: "center", justifyContent: "center", fontSize: "14px", color: "#ccc" }}>👤</div>
                         )}
-                        <span style={{ fontSize: "14px", fontWeight: "600", color: "#001459" }}>{student.firstName} {student.lastName}</span>
-                      </div>
+                        <span style={{ fontSize: "14px", fontWeight: "600", color: "#001459", cursor: "pointer" }}>{student.firstName} {student.lastName}</span>
+                      </Link>
                     </td>
                     <td style={{ padding: "12px 16px", fontSize: "13px", color: "#666" }}>{student.email}</td>
                     <td style={{ padding: "12px 16px", fontSize: "13px", color: "#666" }}>{student.phone}</td>
@@ -127,7 +127,7 @@ export default async function StudentsPage() {
                         <span style={{ padding: "4px 12px", borderRadius: "12px", fontSize: "11px", fontWeight: "600", backgroundColor: "#E8F5E9", color: "#2E7D32" }}>Envoyee</span>
                       )}
                       {canApply && !hasApplication && !docsComplete && (
-                        <span style={{ fontSize: "10px", color: "#C62828", display: "block", marginTop: "4px" }}>{docs < 5 ? "Docs incomplets" : !hasPhoto ? "Photo manquante" : "Infos incompletes"}</span>
+                        <span style={{ fontSize: "10px", color: "#C62828", display: "block", marginTop: "4px" }}>{!hasTranscript ? "Releve de notes *" : !hasPassport ? "Passeport *" : !hasPhoto ? "Photo *" : "Infos incompletes"}</span>
                       )}
                     </td>
                     <td style={{ padding: "12px 16px" }}>
@@ -135,7 +135,7 @@ export default async function StudentsPage() {
                         <Link href={`/dashboard/students/${student.id}`} style={{
                           padding: "6px 14px", borderRadius: "6px", border: "1px solid #DDBA52",
                           color: "#DDBA52", textDecoration: "none", fontWeight: "600", fontSize: "12px",
-                        }}>Voir</Link>
+                        }}>Modifier</Link>
                         {canDelete && (
                           <DeleteStudentButton studentId={student.id} studentName={`${student.firstName} ${student.lastName}`} />
                         )}

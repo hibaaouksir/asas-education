@@ -21,6 +21,8 @@ export async function POST(request: Request) {
         diploma: body.diploma || null,
         cv: body.cv || null,
         motivationLetter: body.motivationLetter || null,
+        photo: body.photo || null,
+        additionalDocs: body.additionalDocs || [],
         consultantId: body.consultantId || null,
         desiredProgramId: body.programId || null,
       },

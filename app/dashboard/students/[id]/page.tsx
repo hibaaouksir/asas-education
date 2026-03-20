@@ -98,27 +98,27 @@ export default async function StudentDetailPage({ params }: { params: Promise<{ 
             <h3 style={{ color: "#001459", fontSize: "16px", fontWeight: "700", marginBottom: "16px" }}>Informations personnelles</h3>
             <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "12px" }}>
               <div>
-                <span style={{ fontSize: "12px", color: "#888" }}>Prenom</span>
+                <span style={{ fontSize: "12px", color: "#888" }}>Prenom <span style={{ color: "#C62828" }}>*</span></span>
                 <p style={{ fontSize: "14px", color: "#001459", fontWeight: "600", margin: "4px 0 0" }}>{student.firstName}</p>
               </div>
               <div>
-                <span style={{ fontSize: "12px", color: "#888" }}>Nom</span>
+                <span style={{ fontSize: "12px", color: "#888" }}>Nom <span style={{ color: "#C62828" }}>*</span></span>
                 <p style={{ fontSize: "14px", color: "#001459", fontWeight: "600", margin: "4px 0 0" }}>{student.lastName}</p>
               </div>
               <div>
-                <span style={{ fontSize: "12px", color: "#888" }}>Email</span>
+                <span style={{ fontSize: "12px", color: "#888" }}>Email <span style={{ color: "#C62828" }}>*</span></span>
                 <p style={{ fontSize: "14px", color: "#001459", fontWeight: "600", margin: "4px 0 0" }}>{student.email}</p>
               </div>
               <div>
-                <span style={{ fontSize: "12px", color: "#888" }}>Telephone</span>
+                <span style={{ fontSize: "12px", color: "#888" }}>Telephone <span style={{ color: "#C62828" }}>*</span></span>
                 <p style={{ fontSize: "14px", color: "#001459", fontWeight: "600", margin: "4px 0 0" }}>{student.phone}</p>
               </div>
               <div>
-                <span style={{ fontSize: "12px", color: "#888" }}>Passeport ou CIN</span>
+                <span style={{ fontSize: "12px", color: "#888" }}>Passeport ou CIN <span style={{ color: "#C62828" }}>*</span></span>
                 <p style={{ fontSize: "14px", color: "#001459", fontWeight: "600", margin: "4px 0 0" }}>{student.passportNumber || "-"}</p>
               </div>
               <div>
-                <span style={{ fontSize: "12px", color: "#888" }}>Nationalite</span>
+                <span style={{ fontSize: "12px", color: "#888" }}>Nationalite <span style={{ color: "#C62828" }}>*</span></span>
                 <p style={{ fontSize: "14px", color: "#001459", fontWeight: "600", margin: "4px 0 0" }}>{student.citizenship || "-"}</p>
               </div>
             </div>
@@ -166,8 +166,9 @@ export default async function StudentDetailPage({ params }: { params: Promise<{ 
           diploma: student.diploma || "",
           cv: student.cv || "",
           motivationLetter: student.motivationLetter || "",
-          photo: student.photo || "",
+         photo: student.photo || "",
         }}
+        additionalDocs={student.additionalDocs || []}
       />
     </div>
   );

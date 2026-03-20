@@ -222,6 +222,7 @@ model Program {
   pricePerYear   Float?
   currency       String   @default("USD")
   description    String?
+  image          String?
 
   universityId   String
   university     University @relation(fields: [universityId], references: [id], onDelete: Cascade)

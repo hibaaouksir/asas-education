@@ -15,6 +15,7 @@ export async function POST(request: Request) {
         currency: body.currency || "USD",
         universityId: body.universityId,
         description: body.description || null,
+        image: body.image || null,
       },
     });
     return NextResponse.json(program, { status: 201 });

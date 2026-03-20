@@ -15,6 +15,8 @@ export async function PUT(request: Request, { params }: { params: Promise<{ id: 
         duration: body.duration,
         pricePerYear: body.pricePerYear || null,
         currency: body.currency || "USD",
+        description: body.description !== undefined ? body.description : undefined,
+        image: body.image !== undefined ? body.image : undefined,
       },
     });
     return NextResponse.json(program);

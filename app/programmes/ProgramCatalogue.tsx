@@ -246,6 +246,11 @@ export default function ProgramCatalogue({ programs, countries }: { programs: Pr
               }}>&#10005;</button>
               <p style={{ color: "rgba(255,255,255,0.5)", fontSize: "11px", fontWeight: "600", textTransform: "uppercase", letterSpacing: "1px", margin: "0 0 6px" }}>{selectedGroup.department}</p>
               <h2 style={{ color: "white", fontSize: "24px", fontWeight: "800", margin: "0 0 8px" }}>{selectedGroup.name}</h2>
+              <Link href={`/programmes/${encodeURIComponent(selectedGroup.name.toLowerCase().replace(/ /g, "-"))}`} style={{
+                display: "inline-block", marginBottom: "10px", padding: "6px 16px", borderRadius: "8px",
+                backgroundColor: "rgba(221,186,82,0.2)", color: "#DDBA52", textDecoration: "none",
+                fontSize: "12px", fontWeight: "700",
+              }}>En savoir plus sur ce programme →</Link>
               <div style={{ display: "flex", gap: "6px" }}>
                 {selectedGroup.degrees.map(d => (
                   <span key={d} style={{
@@ -303,7 +308,7 @@ export default function ProgramCatalogue({ programs, countries }: { programs: Pr
                     </div>
 
                     <div style={{ display: "flex", gap: "8px", justifyContent: "flex-end" }}>
-                      <Link href={`/universites/${p.universityId}`} style={{
+                      <Link href={`/universites/${p.universityId}?programme=${encodeURIComponent(p.name.toLowerCase())}`} style={{
                         padding: "8px 16px", borderRadius: "8px", fontSize: "12px", fontWeight: "600",
                         color: "#001459", backgroundColor: "#F0F4FF", textDecoration: "none",
                         border: "1px solid #E0E8FF",

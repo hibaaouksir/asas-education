@@ -2,7 +2,7 @@ import { prisma } from "@/lib/prisma";
 import ProgramForm from "./ProgramForm";
 import ProgramActions from "./ProgramActions";
 import ProgramGroupEdit from "./ProgramGroupEdit";
-
+import ProgramAccordion from "./ProgramAccordion";
 export default async function ProgramsPage() {
   const programs = await prisma.program.findMany({
     include: { university: { include: { city: { include: { country: true } } } } },
@@ -59,7 +59,7 @@ export default async function ProgramsPage() {
                   {/* Program Header */}
                   <div style={{
                     padding: "16px 20px", display: "flex", alignItems: "center", justifyContent: "space-between",
-                    borderBottom: "1px solid #f0f0f0", backgroundColor: "#FAFAFA",
+                    backgroundColor: "#FAFAFA",
                   }}>
                     <ProgramGroupEdit
                       programName={first.name}
@@ -78,7 +78,7 @@ export default async function ProgramsPage() {
                     </div>
                   </div>
 
-                  {/* Universities Table */}
+                  <ProgramAccordion>
                   <table style={{ width: "100%", borderCollapse: "collapse" }}>
                     <thead>
                       <tr>
@@ -123,6 +123,7 @@ export default async function ProgramsPage() {
                       ))}
                     </tbody>
                   </table>
+                  </ProgramAccordion>
                 </div>
               );
             })}

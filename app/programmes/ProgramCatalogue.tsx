@@ -7,7 +7,7 @@ import Link from "next/link";
 type Program = {
   id: string; universityId: string; name: string; department: string; degree: string;
   language: string; duration: number; pricePerYear: number | null;
-  currency: string; universityName: string; universityPhoto: string | null;
+  currency: string; universityName: string; universityPhoto: string | null; image: string | null;
   cityName: string; countryName: string; countryCode: string;
 };
 type Country = { name: string; code: string };
@@ -172,7 +172,8 @@ export default function ProgramCatalogue({ programs, countries }: { programs: Pr
               >
                 {/* Header with gradient */}
                 <div style={{
-                  background: "linear-gradient(135deg, #001459, #000B2E)",
+                  backgroundImage: g.programs[0]?.image ? `linear-gradient(135deg, rgba(0,20,89,0.3), rgba(0,11,46,0.4)), url(${g.programs[0].image})` : "linear-gradient(135deg, #001459, #000B2E)",
+                  backgroundSize: "cover", backgroundPosition: "center",
                   padding: "28px 24px", position: "relative", overflow: "hidden",
                 }}>
                   <div style={{ position: "absolute", top: "-20px", right: "-20px", width: "100px", height: "100px", borderRadius: "50%", backgroundColor: "rgba(221,186,82,0.08)" }} />

@@ -39,6 +39,7 @@ export default async function ProgrammesPage() {
             currency: p.currency,
             universityName: p.university.name,
             universityPhoto: p.university.photo,
+            image: p.image,
             cityName: p.university.city.name,
             countryName: p.university.city.country.name,
             countryCode: p.university.city.country.code,

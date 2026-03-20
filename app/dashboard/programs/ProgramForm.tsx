@@ -1,20 +1,47 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
 
 type UniOption = { id: string; name: string; cityName: string; countryName: string };
+type ExistingProgram = { name: string; department: string; description: string; image: string };
 
-export default function ProgramForm({ universities }: { universities: UniOption[] }) {
+export default function ProgramForm({ universities, existingPrograms }: { universities: UniOption[]; existingPrograms: ExistingProgram[] }) {
   const router = useRouter();
   const [open, setOpen] = useState(false);
   const [loading, setLoading] = useState(false);
   const [uploading, setUploading] = useState(false);
+  const [suggestions, setSuggestions] = useState<ExistingProgram[]>([]);
+  const [showSuggestions, setShowSuggestions] = useState(false);
   const [form, setForm] = useState({
     name: "", department: "", degree: "Bachelor", language: "English",
     duration: "4", pricePerYear: "", currency: "USD", universityId: "",
     description: "", image: "",
   });
+
+  const handleNameChange = (value: string) => {
+    setForm((prev) => ({ ...prev, name: value }));
+    if (value.length >= 2) {
+      const matches = existingPrograms.filter(p =>
+        p.name.toLowerCase().includes(value.toLowerCase())
+      );
+      setSuggestions(matches);
+      setShowSuggestions(matches.length > 0);
+    } else {
+      setShowSuggestions(false);
+    }
+  };
+
+  const selectExistingProgram = (prog: ExistingProgram) => {
+    setForm((prev) => ({
+      ...prev,
+      name: prog.name,
+      department: prog.department,
+      description: prog.description || prev.description,
+      image: prog.image || prev.image,
+    }));
+    setShowSuggestions(false);
+  };
 
   const handleImageUpload = async (file: File) => {
     setUploading(true);
@@ -86,18 +113,56 @@ export default function ProgramForm({ universities }: { universities: UniOption[
     );
   }
 
+  const isExisting = existingPrograms.some(p => p.name.toLowerCase() === form.name.toLowerCase());
+
   return (
     <div style={{ backgroundColor: "white", padding: "24px", borderRadius: "12px", boxShadow: "0 2px 8px rgba(0,0,0,0.04)", marginBottom: "16px" }}>
       <h3 style={{ color: "#001459", fontSize: "16px", fontWeight: "700", marginBottom: "16px" }}>Nouveau programme</h3>
+
+      {isExisting && (
+        <div style={{
+          backgroundColor: "#E3F2FD", padding: "12px 16px", borderRadius: "8px", marginBottom: "16px",
+          fontSize: "13px", color: "#1565C0", display: "flex", alignItems: "center", gap: "8px",
+        }}>
+          <span style={{ fontSize: "16px" }}>ℹ️</span>
+          Ce programme existe deja. Le departement, la description et l&apos;image ont ete pre-remplis. Choisissez l&apos;universite et les details specifiques.
+        </div>
+      )}
+
       <form onSubmit={handleSubmit}>
         <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "12px", marginBottom: "12px" }}>
-          <div>
+          <div style={{ position: "relative" }}>
             <label style={labelStyle}>Nom du programme *</label>
-            <input required style={inputStyle} placeholder="Ex: Industrial Engineering" value={form.name} onChange={(e) => setForm({ ...form, name: e.target.value })} />
+            <input required style={inputStyle} placeholder="Ex: Industrial Engineering" value={form.name}
+              onChange={(e) => handleNameChange(e.target.value)}
+              onFocus={() => { if (suggestions.length > 0) setShowSuggestions(true); }}
+              onBlur={() => setTimeout(() => setShowSuggestions(false), 200)}
+            />
+            {showSuggestions && (
+              <div style={{
+                position: "absolute", top: "100%", left: 0, right: 0, zIndex: 100,
+                backgroundColor: "white", borderRadius: "8px", boxShadow: "0 4px 12px rgba(0,0,0,0.15)",
+                border: "1px solid #E0E0E0", maxHeight: "200px", overflowY: "auto",
+              }}>
+                {suggestions.map((s, i) => (
+                  <div key={i} onMouseDown={() => selectExistingProgram(s)} style={{
+                    padding: "10px 14px", cursor: "pointer", fontSize: "13px",
+                    borderBottom: i < suggestions.length - 1 ? "1px solid #f0f0f0" : "none",
+                    display: "flex", justifyContent: "space-between", alignItems: "center",
+                  }}>
+                    <div>
+                      <span style={{ fontWeight: "600", color: "#001459" }}>{s.name}</span>
+                      <span style={{ color: "#888", marginLeft: "8px" }}>{s.department}</span>
+                    </div>
+                    <span style={{ fontSize: "11px", color: "#DDBA52", fontWeight: "600" }}>Utiliser</span>
+                  </div>
+                ))}
+              </div>
+            )}
           </div>
           <div>
             <label style={labelStyle}>Departement *</label>
-            <input required style={inputStyle} placeholder="Ex: Engineering" value={form.department} onChange={(e) => setForm({ ...form, department: e.target.value })} />
+            <input required style={{ ...inputStyle, backgroundColor: isExisting ? "#F5F5F5" : "white" }} placeholder="Ex: Engineering" value={form.department} onChange={(e) => setForm({ ...form, department: e.target.value })} readOnly={isExisting} />
           </div>
         </div>
         <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr 1fr", gap: "12px", marginBottom: "12px" }}>
@@ -151,20 +216,20 @@ export default function ProgramForm({ universities }: { universities: UniOption[
           </div>
         </div>
 
-        {/* Description */}
+        {/* Description - only show if new program or editing */}
         <div style={{ marginBottom: "12px" }}>
-          <label style={labelStyle}>Description du programme</label>
+          <label style={labelStyle}>Description du programme {isExisting && <span style={{ color: "#888", fontWeight: "400" }}>(pre-remplie)</span>}</label>
           <textarea
-            style={{ ...inputStyle, minHeight: "100px", resize: "vertical" }}
-            placeholder="Decrivez le programme en detail : contenu, debouches, competences..."
+            style={{ ...inputStyle, minHeight: "100px", resize: "vertical", backgroundColor: isExisting && form.description ? "#F5F5F5" : "white" }}
+            placeholder="Decrivez le programme en detail..."
             value={form.description}
             onChange={(e) => setForm({ ...form, description: e.target.value })}
           />
         </div>
 
-        {/* Image */}
+        {/* Image - only show if new program or no image yet */}
         <div style={{ marginBottom: "16px" }}>
-          <label style={labelStyle}>Image du programme</label>
+          <label style={labelStyle}>Image du programme {isExisting && form.image && <span style={{ color: "#888", fontWeight: "400" }}>(pre-remplie)</span>}</label>
           <div style={{ display: "flex", alignItems: "center", gap: "16px" }}>
             {form.image ? (
               <img src={form.image} alt="Preview" style={{ width: "120px", height: "80px", objectFit: "cover", borderRadius: "8px", border: "2px solid #DDBA52" }} />

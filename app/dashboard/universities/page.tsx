@@ -7,7 +7,7 @@ import DeleteUniversityButton from "./DeleteUniversityButton";
 export default async function UniversitiesPage() {
   const session = await auth();
   const role = session?.user?.role;
-  const canEdit = role === "ADMIN";
+  const canEdit = role === "ADMIN" || role === "APPLICATION";
   const cities = await prisma.city.findMany({
     include: { country: true },
     orderBy: { name: "asc" },

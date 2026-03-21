@@ -4,11 +4,11 @@ import { useState } from "react";
 import { useRouter } from "next/navigation";
 
 type Application = {
-  id: string; studentName: string; studentEmail: string; studentPhoto: string;
+  id: string; studentId: string; studentName: string; studentEmail: string; studentPhoto: string;
   universityName: string; programName: string; department: string;
   degree: string; language: string; countryName: string;
   status: string; offerLetter: string; finalAdmission: string;
-  source: string; createdAt: string;
+  source: string; createdAt: string; isUpdated: boolean;
 };
 
 const statusConfig: Record<string, { label: string; bg: string; color: string }> = {
@@ -24,7 +24,7 @@ export default function ApplicationTable({ applications, isAdmin, role }: { appl
   const [filter, setFilter] = useState("ALL");
   const [uploading, setUploading] = useState("");
 
-  const filtered = filter === "ALL" ? applications : applications.filter(a => a.status === filter);
+  const filtered = filter === "ALL" ? applications : filter === "UPDATED" ? applications.filter(a => a.isUpdated) : applications.filter(a => a.status === filter);
 
   const counts = {
     ALL: applications.length,
@@ -34,6 +34,7 @@ export default function ApplicationTable({ applications, isAdmin, role }: { appl
     PAID: applications.filter(a => a.status === "PAID").length,
     FINAL_ADMISSION: applications.filter(a => a.status === "FINAL_ADMISSION").length,
   };
+  const updatedCount = applications.filter(a => a.isUpdated).length;
 
   const canChangeStatus = role === "ADMIN" || role === "APPLICATION";
   const canUploadDocs = role === "ADMIN" || role === "APPLICATION";
@@ -41,7 +42,6 @@ export default function ApplicationTable({ applications, isAdmin, role }: { appl
   const getAllowedStatuses = () => {
     if (role === "ADMIN") return Object.keys(statusConfig);
     if (role === "APPLICATION") return ["APPLIED", "RECEIVED", "OFFER_LETTER", "PAID", "FINAL_ADMISSION"];
-
     return [];
   };
 
@@ -92,13 +92,13 @@ export default function ApplicationTable({ applications, isAdmin, role }: { appl
   return (
     <div>
       <div style={{ display: "flex", gap: "8px", marginBottom: "20px", flexWrap: "wrap" }}>
-        {[{ key: "ALL", label: "Toutes" }, ...Object.entries(statusConfig).map(([key, val]) => ({ key, label: val.label }))].map(({ key, label }) => (
+        {[{ key: "ALL", label: "Toutes" }, { key: "UPDATED", label: "Mis a jour" }, ...Object.entries(statusConfig).map(([key, val]) => ({ key, label: val.label }))].map(({ key, label }) => (
           <button key={key} onClick={() => setFilter(key)} style={{
             padding: "8px 16px", borderRadius: "20px", border: "none", fontSize: "13px",
             fontWeight: "600", cursor: "pointer",
-            backgroundColor: filter === key ? "#001459" : "#f0f0f0",
-            color: filter === key ? "white" : "#666",
-          }}>{label} ({counts[key as keyof typeof counts] || 0})</button>
+            backgroundColor: filter === key ? (key === "UPDATED" ? "#E65100" : "#001459") : (key === "UPDATED" && updatedCount > 0 ? "#FFF3E0" : "#f0f0f0"),
+            color: filter === key ? "white" : (key === "UPDATED" && updatedCount > 0 ? "#E65100" : "#666"),
+          }}>{label} ({key === "UPDATED" ? updatedCount : (counts[key as keyof typeof counts] || 0)})</button>
         ))}
       </div>
 
@@ -124,17 +124,20 @@ export default function ApplicationTable({ applications, isAdmin, role }: { appl
                 return (
                   <tr key={app.id} style={{ borderTop: "1px solid #F0F0F0" }}>
                     <td style={{ padding: "12px 16px" }}>
-                      <div style={{ display: "flex", alignItems: "center", gap: "10px" }}>
+                      <a href={`/dashboard/students/${app.studentId}/profile`} style={{ display: "flex", alignItems: "center", gap: "10px", textDecoration: "none" }}>
                         {app.studentPhoto ? (
                           <img src={app.studentPhoto} alt="" style={{ width: "36px", height: "36px", borderRadius: "50%", objectFit: "cover", border: "2px solid #DDBA52" }} />
                         ) : (
                           <div style={{ width: "36px", height: "36px", borderRadius: "50%", backgroundColor: "#F0F0F0", display: "flex", alignItems: "center", justifyContent: "center", fontSize: "14px", color: "#ccc" }}>👤</div>
                         )}
                         <div>
-                          <p style={{ fontSize: "14px", fontWeight: "600", color: "#001459", margin: "0 0 2px" }}>{app.studentName}</p>
+                         <p style={{ fontSize: "14px", fontWeight: "600", color: "#001459", margin: "0 0 2px" }}>
+                            {app.studentName}
+                            {app.isUpdated && <span style={{ marginLeft: "8px", padding: "2px 8px", borderRadius: "10px", fontSize: "9px", fontWeight: "700", backgroundColor: "#FFF3E0", color: "#E65100" }}>Mis a jour</span>}
+                          </p>
                           <p style={{ fontSize: "11px", color: "#888", margin: 0 }}>{app.studentEmail}</p>
                         </div>
-                      </div>
+                      </a>
                     </td>
                     <td style={{ padding: "12px 16px", fontSize: "13px", color: "#666" }}>{app.universityName}</td>
                     <td style={{ padding: "12px 16px" }}>

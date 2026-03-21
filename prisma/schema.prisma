@@ -161,6 +161,7 @@ model StudentApplication {
   status    String   @default("APPLIED") // APPLIED, RECEIVED, OFFER_LETTER, PAID, FINAL_ADMISSION
   offerLetter String?
   finalAdmission String?
+  isUpdated Boolean @default(false)
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 

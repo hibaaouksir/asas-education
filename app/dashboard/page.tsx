@@ -165,17 +165,7 @@ export default async function DashboardPage() {
               <p style={{ fontSize: "12px", opacity: 0.5, margin: 0 }}>Total des candidatures</p>
             </div>
           </Link>
-          <Link href="/dashboard/students" style={{ textDecoration: "none" }}>
-            <div style={{
-              backgroundColor: "white", padding: "28px", borderRadius: "16px",
-              boxShadow: "0 1px 4px rgba(0,0,0,0.04)", cursor: "pointer",
-              borderTop: "4px solid #001459",
-            }}>
-              <span style={{ fontSize: "28px" }}>🎓</span>
-              <p style={{ color: "#001459", fontSize: "36px", fontWeight: "800", margin: "8px 0 2px", lineHeight: 1 }}>{studentCount}</p>
-              <p style={{ color: "#999", fontSize: "12px", margin: 0 }}>Etudiants</p>
-            </div>
-          </Link>
+       
           <Link href="/dashboard/announcements" style={{ textDecoration: "none" }}>
             <div style={{
               backgroundColor: "white", padding: "28px", borderRadius: "16px",
@@ -249,7 +239,7 @@ export default async function DashboardPage() {
           <p style={{ color: "#888", fontSize: "14px", margin: 0 }}>Voici un apercu de votre activite</p>
         </div>
 
-        <div style={{ display: "grid", gridTemplateColumns: "2fr 1fr 1fr", gap: "16px", marginBottom: "24px" }}>
+        <div style={{ display: "grid", gridTemplateColumns: "2fr 1fr", gap: "16px", marginBottom: "24px" }}>
           <Link href="/dashboard/leads" style={{ textDecoration: "none" }}>
             <div style={{
               background: "linear-gradient(135deg, #001459, #002080)", padding: "28px",

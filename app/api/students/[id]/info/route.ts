@@ -23,6 +23,9 @@ export async function PUT(request: Request, { params }: { params: Promise<{ id: 
       },
     });
 
+    // Mark candidature as updated if exists
+    await prisma.studentApplication.updateMany({ where: { studentId: id }, data: { isUpdated: true } });
+
     return NextResponse.json(student);
   } catch (error) {
     console.error("Error updating student info:", error);

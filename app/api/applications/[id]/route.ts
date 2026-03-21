@@ -8,6 +8,7 @@ export async function PUT(request: Request, { params }: { params: Promise<{ id: 
 
     const data: Record<string, unknown> = {};
     if (body.status) data.status = body.status;
+    if (body.status) data.isUpdated = false;
     if (body.offerLetter) data.offerLetter = body.offerLetter;
     if (body.finalAdmission) data.finalAdmission = body.finalAdmission;
 

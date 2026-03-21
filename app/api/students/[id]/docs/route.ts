@@ -13,6 +13,7 @@ export async function PUT(request: Request, { params }: { params: Promise<{ id: 
         where: { id },
         data: { additionalDocs: { push: url } },
       });
+      await prisma.studentApplication.updateMany({ where: { studentId: id }, data: { isUpdated: true } });
       return NextResponse.json(student);
     }
 
@@ -25,6 +26,7 @@ export async function PUT(request: Request, { params }: { params: Promise<{ id: 
       where: { id },
       data: { [field]: url },
     });
+    await prisma.studentApplication.updateMany({ where: { studentId: id }, data: { isUpdated: true } });
 
     return NextResponse.json(student);
   } catch (error) {

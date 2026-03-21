@@ -36,9 +36,11 @@ export default async function ApplicationsPage() {
       <ApplicationTable
         applications={applications.map(a => ({
           id: a.id,
+          studentId: a.student.id,
           studentName: `${a.student.firstName} ${a.student.lastName}`,
           studentEmail: a.student.email,
           studentPhoto: a.student.photo || "",
+          isUpdated: a.isUpdated || false,
           universityName: a.program.university.name,
           programName: a.program.name,
           department: a.program.department,

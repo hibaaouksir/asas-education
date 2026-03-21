@@ -162,6 +162,7 @@ model StudentApplication {
   offerLetter String?
   finalAdmission String?
   isUpdated Boolean @default(false)
+  isNewPaid Boolean @default(false)
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 

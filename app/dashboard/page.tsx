@@ -32,6 +32,8 @@ export default async function DashboardPage() {
     finalAdmission: await prisma.studentApplication.count({ where: { status: "FINAL_ADMISSION" } }),
     total: await prisma.studentApplication.count(),
   } : null;
+  const updatedCount = (role === "APPLICATION") ? await prisma.studentApplication.count({ where: { isUpdated: true } }) : 0;
+  const newPaidCount = (role === "APPLICATION") ? await prisma.studentApplication.count({ where: { isNewPaid: true } }) : 0;
 
   const recentLeads = role === "ADMIN" || role === "CONSULTANT" 
     ? await prisma.lead.findMany({
@@ -179,27 +181,45 @@ export default async function DashboardPage() {
           </Link>
         </div>
 
-        <div style={{ display: "grid", gridTemplateColumns: "repeat(5, 1fr)", gap: "12px", marginBottom: "24px" }}>
-          {[
-            { label: "Applied", count: appCounts?.applied || 0, bg: "#E3F2FD", color: "#1565C0" },
-            { label: "Received", count: appCounts?.received || 0, bg: "#FFF3E0", color: "#E65100" },
-            { label: "Offer Letter", count: appCounts?.offerLetter || 0, bg: "#F3E5F5", color: "#7B1FA2" },
-            { label: "Paid", count: appCounts?.paid || 0, bg: "#E8F5E9", color: "#2E7D32" },
-            { label: "Final Admission", count: appCounts?.finalAdmission || 0, bg: "#E8F5E9", color: "#1B5E20" },
-          ].map((stat, i) => (
-            <Link key={i} href="/dashboard/applications" style={{ textDecoration: "none" }}>
-              <div style={{
-                backgroundColor: "white", padding: "16px", borderRadius: "12px",
-                boxShadow: "0 1px 4px rgba(0,0,0,0.04)", textAlign: "center", cursor: "pointer",
-              }}>
-                <p style={{ fontSize: "24px", fontWeight: "800", color: stat.color, margin: "0 0 4px" }}>{stat.count}</p>
-                <span style={{
-                  padding: "3px 8px", borderRadius: "10px", fontSize: "10px", fontWeight: "600",
-                  backgroundColor: stat.bg, color: stat.color,
-                }}>{stat.label}</span>
-              </div>
-            </Link>
-          ))}
+        <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "16px", marginBottom: "24px" }}>
+          <Link href="/dashboard/applications?filter=UPDATED" style={{ textDecoration: "none" }}>
+            <div style={{
+              backgroundColor: updatedCount > 0 ? "#FFF3E0" : "white", padding: "24px", borderRadius: "14px",
+              boxShadow: updatedCount > 0 ? "0 2px 12px rgba(230,81,0,0.15)" : "0 1px 4px rgba(0,0,0,0.04)",
+              textAlign: "center", cursor: "pointer", border: updatedCount > 0 ? "2px solid #E65100" : "1px solid #f0f0f0",
+              transition: "all 0.3s",
+            }}>
+              {updatedCount > 0 && (
+                <p style={{ fontSize: "12px", color: "#E65100", fontWeight: "600", margin: "0 0 8px" }}>
+                  {updatedCount} candidat{updatedCount > 1 ? "s" : ""} mis a jour
+                </p>
+              )}
+              <p style={{ fontSize: "32px", fontWeight: "800", color: updatedCount > 0 ? "#E65100" : "#888", margin: "0 0 4px" }}>{updatedCount}</p>
+              <span style={{
+                padding: "4px 12px", borderRadius: "10px", fontSize: "11px", fontWeight: "600",
+                backgroundColor: updatedCount > 0 ? "#FFF3E0" : "#f0f0f0", color: updatedCount > 0 ? "#E65100" : "#888",
+              }}>Mis a jour</span>
+            </div>
+          </Link>
+          <Link href="/dashboard/applications?filter=PAID" style={{ textDecoration: "none" }}>
+            <div style={{
+              backgroundColor: newPaidCount > 0 ? "#E8F5E9" : "white", padding: "24px", borderRadius: "14px",
+              boxShadow: newPaidCount > 0 ? "0 2px 12px rgba(46,125,50,0.15)" : "0 1px 4px rgba(0,0,0,0.04)",
+              textAlign: "center", cursor: "pointer", border: newPaidCount > 0 ? "2px solid #2E7D32" : "1px solid #f0f0f0",
+              transition: "all 0.3s",
+            }}>
+              {newPaidCount > 0 && (
+                <p style={{ fontSize: "12px", color: "#2E7D32", fontWeight: "600", margin: "0 0 8px" }}>
+                  {newPaidCount} candidat{newPaidCount > 1 ? "s" : ""} ont paye
+                </p>
+              )}
+              <p style={{ fontSize: "32px", fontWeight: "800", color: newPaidCount > 0 ? "#2E7D32" : "#888", margin: "0 0 4px" }}>{appCounts?.paid || 0}</p>
+              <span style={{
+                padding: "4px 12px", borderRadius: "10px", fontSize: "11px", fontWeight: "600",
+                backgroundColor: newPaidCount > 0 ? "#E8F5E9" : "#f0f0f0", color: newPaidCount > 0 ? "#2E7D32" : "#888",
+              }}>Paid</span>
+            </div>
+          </Link>
         </div>
 
         <div style={{ backgroundColor: "white", borderRadius: "14px", boxShadow: "0 1px 4px rgba(0,0,0,0.04)", overflow: "hidden" }}>

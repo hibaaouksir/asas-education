@@ -18,10 +18,6 @@ export default async function StudentProfilePage({ params }: { params: Promise<{
   });
 
   if (!student) return notFound();
-  // If Application role views the profile, mark candidature as seen
-  if (role === "APPLICATION") {
-    await prisma.studentApplication.updateMany({ where: { studentId: id }, data: { isUpdated: false } });
-  }
 
   const program = student.applications[0]?.program || student.desiredProgram;
   const university = program?.university;
@@ -40,8 +36,8 @@ export default async function StudentProfilePage({ params }: { params: Promise<{
 
   return (
     <div>
-      <Link href={role === "APPLICATION" ? "/dashboard/applications" : "/dashboard/students"} style={{ color: "#888", textDecoration: "none", fontSize: "13px", display: "block", marginBottom: "20px" }}>
-        {role === "APPLICATION" ? "← Retour aux candidatures" : "← Retour aux etudiants"}
+      <Link href="/dashboard/students" style={{ color: "#888", textDecoration: "none", fontSize: "13px", display: "block", marginBottom: "20px" }}>
+        ← Retour aux etudiants
       </Link>
 
       {/* Header with photo */}

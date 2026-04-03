@@ -23,7 +23,7 @@ export async function GET(request: Request) {
         Ville: l.city,
         Niveau: l.educationLevel,
         Statut: l.status,
-        Source: l.source,
+        Source: l.sourceName,
         Universite: l.universityName || "",
         Consultant: l.consultant ? `${l.consultant.firstName} ${l.consultant.lastName}` : "",
         Date: new Date(l.createdAt).toLocaleDateString("fr-FR"),

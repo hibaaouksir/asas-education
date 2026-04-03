@@ -37,7 +37,7 @@ export default function Navbar() {
         <Link href="/contact" style={{ color: "#001459", textDecoration: "none", fontSize: "14px", fontWeight: "600" }}>
           Contact
         </Link>
-        <Link href="#booking" style={{
+        <Link href="/#booking" style={{
           backgroundColor: "#DDBA52",
           color: "#001459",
           padding: "10px 20px",

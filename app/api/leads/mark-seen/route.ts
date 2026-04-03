@@ -8,7 +8,7 @@ export async function POST() {
   
   await prisma.user.update({
     where: { id: session.user.id },
-    data: { lastSeenLeadsAt: new Date() },
+    data: { lastSeenLeads: new Date() },
   });
   
   return NextResponse.json({ success: true });

@@ -113,11 +113,12 @@ export default function ApplicationTable({ applications, isAdmin, role }: { appl
               {(role === "ADMIN" || role === "APPLICATION") && <th style={{ padding: "12px 16px", textAlign: "left", fontSize: "12px", color: "#888", fontWeight: "600", textTransform: "uppercase" }}>Source</th>}
               <th style={{ padding: "12px 16px", textAlign: "left", fontSize: "12px", color: "#888", fontWeight: "600", textTransform: "uppercase" }}>Statut</th>
               <th style={{ padding: "12px 16px", textAlign: "left", fontSize: "12px", color: "#888", fontWeight: "600", textTransform: "uppercase" }}>Documents</th>
+              {(role === "CONSULTANT" || role === "SUB_AGENT") && <th style={{ padding: "12px 16px", textAlign: "left", fontSize: "12px", color: "#888", fontWeight: "600", textTransform: "uppercase" }}>Actions</th>}
             </tr>
           </thead>
           <tbody>
             {filtered.length === 0 ? (
-              <tr><td colSpan={7} style={{ padding: "40px", textAlign: "center", color: "#888", fontSize: "14px" }}>Aucune candidature.</td></tr>
+              <tr><td colSpan={8} style={{ padding: "40px", textAlign: "center", color: "#888", fontSize: "14px" }}>Aucune candidature.</td></tr>
             ) : (
               filtered.map((app) => {
                 const config = statusConfig[app.status] || statusConfig.APPLIED;
@@ -212,6 +213,15 @@ export default function ApplicationTable({ applications, isAdmin, role }: { appl
                         )}
                       </div>
                     </td>
+                    {(role === "CONSULTANT" || role === "SUB_AGENT") && (
+                      <td style={{ padding: "12px 16px" }}>
+                        <a href={`/dashboard/students/${app.studentId}?from=applications`} style={{
+                          padding: "6px 12px", borderRadius: "6px", border: "1px solid #DDBA52",
+                          color: "#DDBA52", textDecoration: "none", fontSize: "12px", fontWeight: "600",
+                        }}>Modifier docs</a>
+                      </td>
+                    )}
+
                   </tr>
                 );
               })

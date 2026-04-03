@@ -57,7 +57,7 @@ export default async function ProgramsPage() {
               return (
                 <div key={key} style={{ backgroundColor: "white", borderRadius: "12px", boxShadow: "0 2px 8px rgba(0,0,0,0.04)", overflow: "hidden" }}>
                   {/* Program Header */}
-                  <div style={{
+                  <div suppressHydrationWarning style={{
                     padding: "16px 20px", display: "flex", alignItems: "center", justifyContent: "space-between",
                     backgroundColor: "#FAFAFA",
                   }}>

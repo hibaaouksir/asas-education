@@ -36,6 +36,21 @@ export default function ProgramGroupEdit({ programName, department, description,
     }
     setUploading(false);
   };
+  const handleDeleteAll = async () => {
+    if (!confirm(`Supprimer le programme "${programName}" et toutes ses universites ? Cette action est irreversible.`)) return;
+    setLoading(true);
+    try {
+      const res = await fetch("/api/programs/delete-group", {
+        method: "DELETE",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ name: programName }),
+      });
+      if (res.ok) router.refresh();
+    } catch (err) {
+      console.error(err);
+    }
+    setLoading(false);
+  };
 
   const handleSave = async () => {
     setLoading(true);
@@ -84,6 +99,11 @@ export default function ProgramGroupEdit({ programName, department, description,
           </div>
           <p style={{ color: "#888", fontSize: "12px", margin: "2px 0 0" }}>{department}</p>
         </div>
+        <button onClick={(e) => { e.stopPropagation(); handleDeleteAll(); }} style={{
+          padding: "4px 10px", borderRadius: "6px", border: "1px solid #DD061A",
+          backgroundColor: "transparent", color: "#DD061A", fontSize: "11px",
+          fontWeight: "600", cursor: "pointer", marginLeft: "auto",
+        }}>Supprimer</button>
       </div>
     );
   }

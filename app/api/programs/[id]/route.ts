@@ -29,6 +29,13 @@ export async function PUT(request: Request, { params }: { params: Promise<{ id: 
 export async function DELETE(request: Request, { params }: { params: Promise<{ id: string }> }) {
   try {
     const { id } = await params;
+    // Remove desiredProgramId references from students
+    await prisma.student.updateMany({ where: { desiredProgramId: id }, data: { desiredProgramId: null } });
+    // Delete related applications
+    await prisma.studentApplication.deleteMany({ where: { programId: id } });
+    // Delete the program
+    await prisma.student.updateMany({ where: { desiredProgramId: id }, data: { desiredProgramId: null } });
+    await prisma.studentApplication.deleteMany({ where: { programId: id } });
     await prisma.program.delete({ where: { id } });
     return NextResponse.json({ success: true });
   } catch (error) {

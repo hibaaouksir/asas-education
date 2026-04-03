@@ -19,9 +19,8 @@ export default async function StudentProfilePage({ params }: { params: Promise<{
 
   if (!student) return notFound();
   if (role === "APPLICATION") {
-    await prisma.studentApplication.updateMany({ where: { studentId: id }, data: { isUpdated: false } });
+    await prisma.studentApplication.updateMany({ where: { studentId: id }, data: { isUpdated: false, isNewPaid: false } });
   }
-
   const program = student.applications[0]?.program || student.desiredProgram;
   const university = program?.university;
 

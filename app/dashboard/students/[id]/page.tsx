@@ -5,8 +5,9 @@ import Link from "next/link";
 import DocumentSection from "./DocumentSection";
 import EditStudentInfo from "./EditStudentInfo";
 
-export default async function StudentDetailPage({ params }: { params: Promise<{ id: string }> }) {
+export default async function StudentDetailPage({ params, searchParams }: { params: Promise<{ id: string }>; searchParams: Promise<{ from?: string }> }) {
   const { id } = await params;
+  const { from } = await searchParams;
   const session = await auth();
   const role = session?.user?.role;
   const userId = session?.user?.id;
@@ -45,7 +46,7 @@ export default async function StudentDetailPage({ params }: { params: Promise<{ 
 
   return (
     <div>
-      <Link href="/dashboard/students" style={{ color: "#888", textDecoration: "none", fontSize: "13px" }}>← Retour aux etudiants</Link>
+      <Link href={from === "applications" ? "/dashboard/applications" : "/dashboard/students"} style={{ color: "#888", textDecoration: "none", fontSize: "13px" }}>{from === "applications" ? "← Retour aux candidatures" : "← Retour aux etudiants"}</Link>
 
       <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", margin: "16px 0 24px" }}>
         <div>

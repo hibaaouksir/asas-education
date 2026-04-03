@@ -106,6 +106,7 @@ export default function LeadTable({ leads, consultants, isAdmin }: { leads: Lead
             <tr style={{ backgroundColor: "#F8F9FA" }}>
               <th style={{ padding: "12px 16px", textAlign: "left", fontSize: "12px", color: "#888", fontWeight: "600", textTransform: "uppercase" }}>Nom</th>
               <th style={{ padding: "12px 16px", textAlign: "left", fontSize: "12px", color: "#888", fontWeight: "600", textTransform: "uppercase" }}>Email</th>
+              <th style={{ padding: "12px 16px", textAlign: "left", fontSize: "12px", color: "#888", fontWeight: "600", textTransform: "uppercase" }}>Telephone</th>
               <th style={{ padding: "12px 16px", textAlign: "left", fontSize: "12px", color: "#888", fontWeight: "600", textTransform: "uppercase" }}>Ville</th>
               <th style={{ padding: "12px 16px", textAlign: "left", fontSize: "12px", color: "#888", fontWeight: "600", textTransform: "uppercase" }}>Niveau</th>
               <th style={{ padding: "12px 16px", textAlign: "left", fontSize: "12px", color: "#888", fontWeight: "600", textTransform: "uppercase" }}>Source</th>
@@ -116,7 +117,7 @@ export default function LeadTable({ leads, consultants, isAdmin }: { leads: Lead
           </thead>
           <tbody>
             {filtered.length === 0 ? (
-              <tr><td colSpan={isAdmin ? 8 : 7} style={{ padding: "40px", textAlign: "center", color: "#888", fontSize: "14px" }}>Aucun lead.</td></tr>
+              <tr><td colSpan={isAdmin ? 9 : 8} style={{ padding: "40px", textAlign: "center", color: "#888", fontSize: "14px" }}>Aucun lead.</td></tr>
             ) : (
               filtered.map((lead) => {
                 const config = statusConfig[lead.status] || statusConfig.NEW;
@@ -124,6 +125,7 @@ export default function LeadTable({ leads, consultants, isAdmin }: { leads: Lead
                   <tr key={lead.id} style={{ borderTop: "1px solid #F0F0F0" }}>
                     <td style={{ padding: "12px 16px", fontSize: "14px", fontWeight: "600", color: "#001459" }}>{lead.firstName} {lead.lastName}</td>
                     <td style={{ padding: "12px 16px", fontSize: "13px", color: "#666" }}>{lead.email}</td>
+                    <td style={{ padding: "12px 16px", fontSize: "13px", color: "#666" }}>{lead.phone || "-"}</td>
                     <td style={{ padding: "12px 16px", fontSize: "13px", color: "#666" }}>{lead.city}</td>
                     <td style={{ padding: "12px 16px", fontSize: "13px", color: "#666" }}>{lead.educationLevel}</td>
                     <td style={{ padding: "12px 16px", fontSize: "12px", color: "#888" }}>{lead.source}</td>

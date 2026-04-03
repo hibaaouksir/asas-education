@@ -24,3 +24,163 @@ body {
   color: var(--foreground);
   font-family: Arial, Helvetica, sans-serif;
 }
+
+/* ======= RESPONSIVE - Mobile ======= */
+@media (max-width: 768px) {
+  /* Navbar */
+  .nav-desktop {
+    display: none !important;
+  }
+  .nav-hamburger {
+    display: flex !important;
+  }
+  nav {
+    padding: 0 16px !important;
+  }
+
+  /* General sections - reduce padding */
+  section {
+    padding-left: 16px !important;
+    padding-right: 16px !important;
+  }
+
+  /* Grids - single column */
+  div[style*="gridTemplateColumns: repeat(auto-fill"] {
+    grid-template-columns: 1fr !important;
+  }
+  div[style*="gridTemplateColumns: repeat(3"] {
+    grid-template-columns: 1fr !important;
+  }
+  div[style*="gridTemplateColumns: repeat(4"] {
+    grid-template-columns: 1fr !important;
+  }
+  div[style*="grid-template-columns: repeat(3"] {
+    grid-template-columns: 1fr !important;
+  }
+  div[style*="grid-template-columns: repeat(4"] {
+    grid-template-columns: 1fr !important;
+  }
+
+  /* Hero section text */
+  h1 {
+    font-size: 28px !important;
+    line-height: 1.2 !important;
+  }
+
+  /* Programme detail - single column */
+  div[style*="gridTemplateColumns: 2fr 1fr"] {
+    grid-template-columns: 1fr !important;
+  }
+
+  /* University cards - images */
+  div[style*="display: flex"][style*="minHeight: 160px"] {
+    flex-direction: column !important;
+  }
+  img[style*="width: 200px"] {
+    width: 100% !important;
+    height: 160px !important;
+  }
+  div[style*="width: 200px"][style*="minHeight: 160px"] {
+    width: 100% !important;
+    height: 120px !important;
+  }
+
+  /* Quick stats row - wrap */
+  div[style*="display: flex"][style*="gap: 40px"] {
+    flex-wrap: wrap !important;
+    gap: 16px !important;
+  }
+
+  /* Footer grid */
+  footer div[style*="gridTemplateColumns"] {
+    grid-template-columns: 1fr !important;
+  }
+
+  /* Tables - horizontal scroll */
+  table {
+    display: block;
+    overflow-x: auto;
+    white-space: nowrap;
+  }
+
+  /* Slider/Hero - reduce height */
+  div[style*="height: 500px"],
+  div[style*="height: 600px"] {
+    height: 350px !important;
+  }
+  section[style*="height: 400px"] {
+    height: 280px !important;
+  }
+
+  /* Search filters - stack */
+  div[style*="display: flex"][style*="flexWrap: wrap"][style*="gap: 12px"] {
+    flex-direction: column !important;
+  }
+
+  /* Programme cards grid */
+  div[style*="minmax(340px"] {
+    grid-template-columns: 1fr !important;
+  }
+
+  /* Destination cards grid */
+  div[style*="minmax(300px"] {
+    grid-template-columns: 1fr !important;
+  }
+
+  /* Blog cards grid */
+  div[style*="minmax(320px"] {
+    grid-template-columns: 1fr !important;
+  }
+
+  /* Max width containers */
+  div[style*="maxWidth: 1200px"],
+  div[style*="max-width: 1200px"] {
+    padding-left: 16px !important;
+    padding-right: 16px !important;
+  }
+
+  /* Font size adjustments */
+  h2 {
+    font-size: 20px !important;
+  }
+  h3 {
+    font-size: 16px !important;
+  }
+
+  /* Country flags and text in cards */
+  div[style*="minmax(280px"] {
+    grid-template-columns: 1fr !important;
+  }
+}
+
+/* ======= RESPONSIVE - Tablet ======= */
+@media (min-width: 769px) and (max-width: 1024px) {
+  .nav-desktop {
+    gap: 16px !important;
+  }
+  .nav-desktop a {
+    font-size: 12px !important;
+  }
+  nav {
+    padding: 0 20px !important;
+  }
+
+  div[style*="gridTemplateColumns: repeat(auto-fill"] {
+    grid-template-columns: repeat(2, 1fr) !important;
+  }
+  div[style*="minmax(340px"] {
+    grid-template-columns: repeat(2, 1fr) !important;
+  }
+  div[style*="minmax(300px"] {
+    grid-template-columns: repeat(2, 1fr) !important;
+  }
+  div[style*="minmax(320px"] {
+    grid-template-columns: repeat(2, 1fr) !important;
+  }
+
+  div[style*="maxWidth: 1200px"],
+  div[style*="max-width: 1200px"] {
+    padding-left: 24px !important;
+    padding-right: 24px !important;
+  }
+}

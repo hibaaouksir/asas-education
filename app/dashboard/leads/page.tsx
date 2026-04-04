@@ -6,6 +6,13 @@ export default async function LeadsPage() {
   const session = await auth();
   const role = session?.user?.role;
   const userId = session?.user?.id;
+  // Mark leads as seen
+  if (userId) {
+    await prisma.user.update({
+      where: { id: userId },
+      data: { lastSeenLeads: new Date() },
+    });
+  }
 
   const leads = await prisma.lead.findMany({
     where: role === "ADMIN" ? {} : { consultantId: userId },

@@ -6,6 +6,13 @@ export default async function ApplicationsPage() {
   const session = await auth();
   const role = session?.user?.role;
   const userId = session?.user?.id;
+  if (userId && (role === "CONSULTANT" || role === "SUB_AGENT")) {
+    await prisma.user.update({
+      where: { id: userId },
+      data: { lastSeenOfferLetters: new Date(), lastSeenFinalAdmissions: new Date() },
+    });
+  }
+
 
   let applications;
   if (role === "ADMIN" || role === "APPLICATION") {

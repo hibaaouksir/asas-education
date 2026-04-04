@@ -408,7 +408,7 @@ function DestinationsSection() {
 
 function BookingSection() {
   const [formData, setFormData] = useState({
-    firstName: "", lastName: "", email: "", phone: "", city: "", level: "", sessionType: "online",
+    firstName: "", lastName: "", email: "", phone: "", city: "", level: "", sessionType: "online", preferredDate: "", preferredTime: "",
   });
   const handleChange = (field: string, value: string) => setFormData((prev) => ({ ...prev, [field]: value }));
   const [bookingLoading, setBookingLoading] = useState(false);
@@ -425,6 +425,7 @@ function BookingSection() {
           email: formData.email, phone: formData.phone,
           city: formData.city, educationLevel: formData.level,
           sessionType: formData.sessionType, sourceName: "Site Web",
+          preferredDate: formData.preferredDate, preferredTime: formData.preferredTime,
         }),
       });
       setBookingDone(true);
@@ -484,6 +485,16 @@ function BookingSection() {
                 <option value="master">Master</option>
                 <option value="doctorat">Doctorat</option>
               </select>
+            </div>
+          </div>
+          <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "14px", marginBottom: "14px" }}>
+            <div>
+              <label style={{ display: "block", marginBottom: "5px", fontSize: "13px", color: "#444", fontWeight: "600" }}>Date souhaitee *</label>
+              <input type="date" required style={inputStyle} value={formData.preferredDate} onChange={(e) => handleChange("preferredDate", e.target.value)} />
+            </div>
+            <div>
+              <label style={{ display: "block", marginBottom: "5px", fontSize: "13px", color: "#444", fontWeight: "600" }}>Heure souhaitee *</label>
+              <input type="time" required style={inputStyle} value={formData.preferredTime} onChange={(e) => handleChange("preferredTime", e.target.value)} />
             </div>
           </div>
           <div style={{ marginBottom: "24px" }}>

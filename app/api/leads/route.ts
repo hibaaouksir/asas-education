@@ -20,6 +20,8 @@ export async function POST(request: Request) {
         departmentName: body.departmentName || null,
         language: body.language || null,
         level: body.level || null,
+        preferredDate: body.preferredDate || null,
+        preferredTime: body.preferredTime || null,
       },
     });
 

@@ -75,6 +75,8 @@ model Lead {
   sourceName     String     @default("Site Web")
 
   sessionType    String?
+  preferredDate  String?
+  preferredTime  String?
 
   universityName  String?
   departmentName  String?

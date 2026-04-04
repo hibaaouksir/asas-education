@@ -7,7 +7,7 @@ type Lead = {
   id: string; firstName: string; lastName: string; email: string;
   phone: string; city: string; educationLevel: string; status: string;
   source: string; universityName: string; consultantId: string;
-  consultantName: string; createdAt: string;
+  consultantName: string; createdAt: string; preferredDate: string; preferredTime: string;
 };
 type Consultant = { id: string; name: string };
 
@@ -110,6 +110,7 @@ export default function LeadTable({ leads, consultants, isAdmin }: { leads: Lead
               <th style={{ padding: "12px 16px", textAlign: "left", fontSize: "12px", color: "#888", fontWeight: "600", textTransform: "uppercase" }}>Ville</th>
               <th style={{ padding: "12px 16px", textAlign: "left", fontSize: "12px", color: "#888", fontWeight: "600", textTransform: "uppercase" }}>Niveau</th>
               <th style={{ padding: "12px 16px", textAlign: "left", fontSize: "12px", color: "#888", fontWeight: "600", textTransform: "uppercase" }}>Source</th>
+              <th style={{ padding: "12px 16px", textAlign: "left", fontSize: "12px", color: "#888", fontWeight: "600", textTransform: "uppercase" }}>RDV souhaite</th>
               {isAdmin && <th style={{ padding: "12px 16px", textAlign: "left", fontSize: "12px", color: "#888", fontWeight: "600", textTransform: "uppercase" }}>Consultant</th>}
               <th style={{ padding: "12px 16px", textAlign: "left", fontSize: "12px", color: "#888", fontWeight: "600", textTransform: "uppercase" }}>Statut</th>
               <th style={{ padding: "12px 16px", textAlign: "left", fontSize: "12px", color: "#888", fontWeight: "600", textTransform: "uppercase" }}>Actions</th>
@@ -117,7 +118,7 @@ export default function LeadTable({ leads, consultants, isAdmin }: { leads: Lead
           </thead>
           <tbody>
             {filtered.length === 0 ? (
-              <tr><td colSpan={isAdmin ? 9 : 8} style={{ padding: "40px", textAlign: "center", color: "#888", fontSize: "14px" }}>Aucun lead.</td></tr>
+              <tr><td colSpan={isAdmin ? 10 : 9} style={{ padding: "40px", textAlign: "center", color: "#888", fontSize: "14px" }}>Aucun lead.</td></tr>
             ) : (
               filtered.map((lead) => {
                 const config = statusConfig[lead.status] || statusConfig.NEW;
@@ -129,6 +130,7 @@ export default function LeadTable({ leads, consultants, isAdmin }: { leads: Lead
                     <td style={{ padding: "12px 16px", fontSize: "13px", color: "#666" }}>{lead.city}</td>
                     <td style={{ padding: "12px 16px", fontSize: "13px", color: "#666" }}>{lead.educationLevel}</td>
                     <td style={{ padding: "12px 16px", fontSize: "12px", color: "#888" }}>{lead.source}</td>
+                    <td style={{ padding: "12px 16px", fontSize: "12px", color: "#666" }}>{lead.preferredDate ? `${lead.preferredDate} a ${lead.preferredTime || "—"}` : "—"}</td>
                     {isAdmin && (
                       <td style={{ padding: "12px 16px" }}>
                         <select value={lead.consultantId} onChange={(e) => handleAssign(lead.id, e.target.value)} style={{

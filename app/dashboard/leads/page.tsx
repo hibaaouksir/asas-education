@@ -42,6 +42,8 @@ export default async function LeadsPage() {
           consultantId: l.consultantId || "",
           consultantName: l.consultant ? `${l.consultant.firstName} ${l.consultant.lastName}` : "-",
           createdAt: l.createdAt.toISOString(),
+          preferredDate: l.preferredDate || "",
+          preferredTime: l.preferredTime || "",
         }))}
         consultants={consultants.map(c => ({ id: c.id, name: `${c.firstName} ${c.lastName}` }))}
         isAdmin={role === "ADMIN"}

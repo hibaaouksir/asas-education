@@ -18,6 +18,7 @@ export default function SearchProgramsClient({ programs, countries, cities }: { 
   const [cityFilter, setCityFilter] = useState("");
   const [degreeFilter, setDegreeFilter] = useState("");
   const [languageFilter, setLanguageFilter] = useState("");
+  const [priceFilter, setPriceFilter] = useState("");
 
   const filteredCities = countryFilter ? cities.filter(c => c.countryId === countryFilter) : cities;
 
@@ -27,6 +28,14 @@ export default function SearchProgramsClient({ programs, countries, cities }: { 
     if (cityFilter) { const city = cities.find(c => c.id === cityFilter); if (city && p.cityName !== city.name) return false; }
     if (degreeFilter && p.degree !== degreeFilter) return false;
     if (languageFilter && p.language !== languageFilter) return false;
+    if (priceFilter) {
+      if (!p.pricePerYear) return priceFilter === "na";
+      if (priceFilter === "0-3000" && p.pricePerYear > 3000) return false;
+      if (priceFilter === "3000-6000" && (p.pricePerYear < 3000 || p.pricePerYear > 6000)) return false;
+      if (priceFilter === "6000-10000" && (p.pricePerYear < 6000 || p.pricePerYear > 10000)) return false;
+      if (priceFilter === "10000+" && p.pricePerYear < 10000) return false;
+      if (priceFilter === "na" && p.pricePerYear) return false;
+    }
     return true;
   });
 
@@ -63,6 +72,14 @@ export default function SearchProgramsClient({ programs, countries, cities }: { 
             <option value="French">French</option>
             <option value="Turkish">Turkish</option>
             <option value="German">German</option>
+          </select>
+          <select style={selectStyle} value={priceFilter} onChange={(e) => setPriceFilter(e.target.value)}>
+            <option value="">Tous les prix</option>
+            <option value="0-3000">Moins de 3 000/an</option>
+            <option value="3000-6000">3 000 - 6 000/an</option>
+            <option value="6000-10000">6 000 - 10 000/an</option>
+            <option value="10000+">Plus de 10 000/an</option>
+            <option value="na">Prix sur demande</option>
           </select>
         </div>
         <div style={{ marginTop: "12px", fontSize: "13px", color: "#888" }}>

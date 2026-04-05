@@ -48,7 +48,7 @@ const m = useIsMobile();
   );
 }
 
-function Navbar() {
+function Navbar({ onOpenRdv }: { onOpenRdv: () => void }) {
   const [scrolled, setScrolled] = useState(false);
   const [menuOpen, setMenuOpen] = useState(false);
   const m = useIsMobile();
@@ -97,15 +97,15 @@ function Navbar() {
               onMouseLeave={(e) => (e.currentTarget.style.color = scrolled ? "rgba(255,255,255,0.85)" : "#001459")}
             >{item.label}</Link>
           ))}
-          <Link href="#booking" style={{
+          <button onClick={onOpenRdv} style={{
             background: "linear-gradient(135deg, #DDBA52, #C4A243)",
             color: "#001459", padding: "12px 28px", borderRadius: "50px",
-            textDecoration: "none", fontSize: "14px", fontWeight: "700",
+            border: "none", fontSize: "14px", fontWeight: "700", cursor: "pointer",
             boxShadow: "0 4px 15px rgba(221,186,82,0.3)", transition: "transform 0.3s",
           }}
             onMouseEnter={(e) => (e.currentTarget.style.transform = "translateY(-2px)")}
             onMouseLeave={(e) => (e.currentTarget.style.transform = "translateY(0)")}
-          >Prenez un RDV</Link>
+          >Prenez un RDV</button>
         </div>
       )}
 
@@ -133,16 +133,17 @@ function Navbar() {
               padding: "12px 0", borderBottom: "1px solid #f0f0f0",
             }}>{l.label}</Link>
           ))}
-          <Link href="#booking" onClick={() => setMenuOpen(false)} style={{
+          <button onClick={() => { setMenuOpen(false); onOpenRdv(); }} style={{
             backgroundColor: "#DDBA52", color: "#001459", padding: "12px 20px",
-            borderRadius: "8px", textDecoration: "none", fontSize: "15px", fontWeight: "bold",
-            textAlign: "center", marginTop: "8px",
-          }}>Prenez un RDV</Link>
+            borderRadius: "8px", border: "none", fontSize: "15px", fontWeight: "bold",
+            textAlign: "center", marginTop: "8px", cursor: "pointer",
+          }}>Prenez un RDV</button>
         </div>
       )}
     </nav>
   );
 }
+
 function FloatingLogo() {
   return (
     <div style={{
@@ -170,11 +171,10 @@ function FloatingLogo() {
   );
 }
 
-function HeroSlider() {
+function HeroSlider({ onOpenRdv }: { onOpenRdv: () => void }) {
   const [current, setCurrent] = useState(0);
   const [fadeIn, setFadeIn] = useState(true);
   const m = useIsMobile();
-
 
   const slides = [
     {
@@ -182,7 +182,7 @@ function HeroSlider() {
       subtitle: "Votre avenir commence ici",
       title: "ETUDIER A L'ETRANGER AVEC ASAS FOR EDUCATION",
       desc: "Nous accompagnons les etudiants vers les meilleures universites en Turquie, Allemagne, Hongrie, Malaisie et bien plus encore.",
-      btn1: { text: "Postulez maintenant", href: "#booking" },
+      btn1: { text: "Postulez maintenant", action: "rdv" },
       btn2: { text: "En savoir plus", href: "#about" },
     },
     {
@@ -281,12 +281,21 @@ function HeroSlider() {
           </p>
 
           <div style={{ display: "flex", gap: "14px", flexWrap: "wrap" }}>
-            <Link href={slides[current].btn1.href} style={{
-              background: "linear-gradient(135deg, #DDBA52, #C4A243)",
-              color: "#001459", padding: "14px 32px", borderRadius: "4px",
-              textDecoration: "none", fontSize: "14px", fontWeight: "700",
-              boxShadow: "0 4px 20px rgba(221,186,82,0.3)", transition: "all 0.3s",
-            }}>{slides[current].btn1.text}</Link>
+            {slides[current].btn1.action === "rdv" ? (
+              <button onClick={onOpenRdv} style={{
+                background: "linear-gradient(135deg, #DDBA52, #C4A243)",
+                color: "#001459", padding: "14px 32px", borderRadius: "4px",
+                border: "none", fontSize: "14px", fontWeight: "700", cursor: "pointer",
+                boxShadow: "0 4px 20px rgba(221,186,82,0.3)", transition: "all 0.3s",
+              }}>{slides[current].btn1.text}</button>
+            ) : (
+              <Link href={slides[current].btn1.href || "#"} style={{
+                background: "linear-gradient(135deg, #DDBA52, #C4A243)",
+                color: "#001459", padding: "14px 32px", borderRadius: "4px",
+                textDecoration: "none", fontSize: "14px", fontWeight: "700",
+                boxShadow: "0 4px 20px rgba(221,186,82,0.3)", transition: "all 0.3s",
+              }}>{slides[current].btn1.text}</Link>
+            )}
             <Link href={slides[current].btn2.href} style={{
               border: "2px solid rgba(255,255,255,0.4)",
               color: "white", padding: "14px 32px", borderRadius: "4px",
@@ -462,17 +471,17 @@ function DestinationsSection() {
   );
 }
 
-function BookingSection() {
+function ContactSection() {
   const m = useIsMobile();
   const [formData, setFormData] = useState({
-    firstName: "", lastName: "", email: "", phone: "", city: "", level: "", sessionType: "online", preferredDate: "", preferredTime: "",
+    firstName: "", lastName: "", email: "", phone: "", city: "", level: "",
   });
   const handleChange = (field: string, value: string) => setFormData((prev) => ({ ...prev, [field]: value }));
-  const [bookingLoading, setBookingLoading] = useState(false);
-  const [bookingDone, setBookingDone] = useState(false);
-  const handleBookingSubmit = async (e: React.FormEvent) => {
+  const [loading, setLoading] = useState(false);
+  const [done, setDone] = useState(false);
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    setBookingLoading(true);
+    setLoading(true);
     try {
       await fetch("/api/leads", {
         method: "POST",
@@ -481,13 +490,12 @@ function BookingSection() {
           firstName: formData.firstName, lastName: formData.lastName,
           email: formData.email, phone: formData.phone,
           city: formData.city, educationLevel: formData.level,
-          sessionType: formData.sessionType, sourceName: "Site Web",
-          preferredDate: formData.preferredDate, preferredTime: formData.preferredTime,
+          sourceName: "Formulaire Contact",
         }),
       });
-      setBookingDone(true);
+      setDone(true);
     } catch (err) { console.error(err); }
-    setBookingLoading(false);
+    setLoading(false);
   };
 
   const inputStyle = {
@@ -497,19 +505,133 @@ function BookingSection() {
   };
 
   return (
-    <section id="booking" style={{ padding: m ? "60px 16px" : "100px 48px", backgroundColor: "white" }}>
+    <section id="contact-form" style={{ padding: m ? "60px 16px" : "100px 48px", backgroundColor: "white" }}>
       <div style={{ maxWidth: "640px", margin: "0 auto" }}>
         <div style={{ textAlign: "center", marginBottom: "40px" }}>
-          <div style={{ color: "#DDBA52", fontSize: "12px", letterSpacing: "4px", textTransform: "uppercase", marginBottom: "14px", fontWeight: "600" }}>Consultation gratuite</div>
+          <div style={{ color: "#DDBA52", fontSize: "12px", letterSpacing: "4px", textTransform: "uppercase", marginBottom: "14px", fontWeight: "600" }}>Contact</div>
           <h2 style={{ color: "#001459", fontSize: "clamp(24px, 3vw, 34px)", fontWeight: "800", marginBottom: "10px" }}>
-            Reservez votre seance d&apos;orientation
+            Contactez-nous
           </h2>
-          <p style={{ color: "#888", fontSize: "14px" }}>30 minutes de consultation individuelle — en ligne ou dans nos bureaux</p>
+          <p style={{ color: "#888", fontSize: "14px" }}>Laissez-nous vos coordonnees et nous vous recontacterons rapidement</p>
         </div>
-        <form onSubmit={handleBookingSubmit} style={{
+        <form onSubmit={handleSubmit} style={{
           backgroundColor: "white", padding: m ? "24px 16px" : "36px", borderRadius: "16px",
           boxShadow: "0 8px 40px rgba(0,0,0,0.06)", border: "1px solid #F0F0F0",
         }}>
+          <div style={{ display: "grid", gridTemplateColumns: m ? "1fr" : "1fr 1fr", gap: "14px", marginBottom: "14px" }}>
+            <div>
+              <label style={{ display: "block", marginBottom: "5px", fontSize: "13px", color: "#444", fontWeight: "600" }}>Nom *</label>
+              <input type="text" required style={inputStyle} placeholder="Votre nom" value={formData.lastName} onChange={(e) => handleChange("lastName", e.target.value)} />
+            </div>
+            <div>
+              <label style={{ display: "block", marginBottom: "5px", fontSize: "13px", color: "#444", fontWeight: "600" }}>Prenom *</label>
+              <input type="text" required style={inputStyle} placeholder="Votre prenom" value={formData.firstName} onChange={(e) => handleChange("firstName", e.target.value)} />
+            </div>
+          </div>
+          <div style={{ marginBottom: "14px" }}>
+            <label style={{ display: "block", marginBottom: "5px", fontSize: "13px", color: "#444", fontWeight: "600" }}>Email *</label>
+            <input type="email" required style={inputStyle} placeholder="votre@email.com" value={formData.email} onChange={(e) => handleChange("email", e.target.value)} />
+          </div>
+          <div style={{ marginBottom: "14px" }}>
+            <label style={{ display: "block", marginBottom: "5px", fontSize: "13px", color: "#444", fontWeight: "600" }}>Telephone *</label>
+            <input type="tel" required style={inputStyle} placeholder="+212 6XX XXX XXX" value={formData.phone} onChange={(e) => handleChange("phone", e.target.value)} />
+          </div>
+          <div style={{ display: "grid", gridTemplateColumns: m ? "1fr" : "1fr 1fr", gap: "14px", marginBottom: "24px" }}>
+            <div>
+              <label style={{ display: "block", marginBottom: "5px", fontSize: "13px", color: "#444", fontWeight: "600" }}>Ville *</label>
+              <input type="text" required style={inputStyle} placeholder="Votre ville" value={formData.city} onChange={(e) => handleChange("city", e.target.value)} />
+            </div>
+            <div>
+              <label style={{ display: "block", marginBottom: "5px", fontSize: "13px", color: "#444", fontWeight: "600" }}>Niveau scolaire *</label>
+              <select required style={{ ...inputStyle, cursor: "pointer" }} value={formData.level} onChange={(e) => handleChange("level", e.target.value)}>
+                <option value="">Selectionnez</option>
+                <option value="bac">Baccalaureat</option>
+                <option value="licence">Licence</option>
+                <option value="master">Master</option>
+                <option value="doctorat">Doctorat</option>
+              </select>
+            </div>
+          </div>
+          <button type="submit" disabled={loading} style={{
+            width: "100%", padding: "15px",
+            background: done ? "#E8F5E9" : "linear-gradient(135deg, #DDBA52, #C4A243)",
+            color: done ? "#2E7D32" : "#001459", border: "none", borderRadius: "10px",
+            fontSize: "15px", fontWeight: "700", cursor: "pointer",
+            boxShadow: "0 4px 20px rgba(221,186,82,0.3)", transition: "all 0.3s",
+            opacity: loading ? 0.7 : 1,
+          }}>{loading ? "Envoi..." : done ? "✅ Demande envoyee avec succes !" : "Envoyer"}</button>
+        </form>
+      </div>
+    </section>
+  );
+}
+
+function RdvModal({ open, onClose }: { open: boolean; onClose: () => void }) {
+  const m = useIsMobile();
+  const [formData, setFormData] = useState({
+    firstName: "", lastName: "", email: "", phone: "", city: "", level: "", sessionType: "online", preferredDate: "", preferredTime: "",
+  });
+  const handleChange = (field: string, value: string) => setFormData((prev) => ({ ...prev, [field]: value }));
+  const [loading, setLoading] = useState(false);
+  const [done, setDone] = useState(false);
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    setLoading(true);
+    try {
+      await fetch("/api/leads", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          firstName: formData.firstName, lastName: formData.lastName,
+          email: formData.email, phone: formData.phone,
+          city: formData.city, educationLevel: formData.level,
+          sessionType: formData.sessionType, sourceName: "Prise de RDV",
+          preferredDate: formData.preferredDate, preferredTime: formData.preferredTime,
+        }),
+      });
+      setDone(true);
+    } catch (err) { console.error(err); }
+    setLoading(false);
+  };
+
+  if (!open) return null;
+
+  const inputStyle = {
+    width: "100%", padding: "13px 16px", border: "1px solid #E0E0E0",
+    borderRadius: "8px", fontSize: "14px", boxSizing: "border-box" as const,
+    outline: "none", backgroundColor: "#FAFAFA", transition: "border-color 0.3s",
+  };
+
+  return (
+    <div onClick={onClose} style={{
+      position: "fixed", top: 0, left: 0, right: 0, bottom: 0,
+      backgroundColor: "rgba(0,0,0,0.6)", zIndex: 2000,
+      display: "flex", alignItems: "center", justifyContent: "center",
+      padding: m ? "16px" : "20px",
+    }}>
+      <div onClick={(e) => e.stopPropagation()} style={{
+        backgroundColor: "white", borderRadius: "16px",
+        padding: m ? "24px 16px" : "36px",
+        maxWidth: "640px", width: "100%",
+        maxHeight: "90vh", overflowY: "auto",
+        boxShadow: "0 20px 60px rgba(0,0,0,0.3)",
+        position: "relative",
+      }}>
+        <button onClick={onClose} style={{
+          position: "absolute", top: "16px", right: "16px",
+          background: "none", border: "none", fontSize: "24px",
+          cursor: "pointer", color: "#999", fontWeight: "bold",
+        }}>✕</button>
+
+        <div style={{ textAlign: "center", marginBottom: "28px" }}>
+          <div style={{ color: "#DDBA52", fontSize: "12px", letterSpacing: "4px", textTransform: "uppercase", marginBottom: "14px", fontWeight: "600" }}>Consultation gratuite</div>
+          <h2 style={{ color: "#001459", fontSize: m ? "20px" : "28px", fontWeight: "800", marginBottom: "10px" }}>
+            Prenez un rendez-vous
+          </h2>
+          <p style={{ color: "#888", fontSize: "14px" }}>30 minutes de consultation individuelle — en ligne ou dans nos bureaux</p>
+        </div>
+
+        <form onSubmit={handleSubmit}>
           <div style={{ display: "grid", gridTemplateColumns: m ? "1fr" : "1fr 1fr", gap: "14px", marginBottom: "14px" }}>
             <div>
               <label style={{ display: "block", marginBottom: "5px", fontSize: "13px", color: "#444", fontWeight: "600" }}>Nom *</label>
@@ -569,24 +691,24 @@ function BookingSection() {
               ))}
             </div>
           </div>
-          <button type="submit" disabled={bookingLoading} style={{
+          <button type="submit" disabled={loading} style={{
             width: "100%", padding: "15px",
-            background: bookingDone ? "#E8F5E9" : "linear-gradient(135deg, #DDBA52, #C4A243)",
-            color: bookingDone ? "#2E7D32" : "#001459", border: "none", borderRadius: "10px",
+            background: done ? "#E8F5E9" : "linear-gradient(135deg, #DDBA52, #C4A243)",
+            color: done ? "#2E7D32" : "#001459", border: "none", borderRadius: "10px",
             fontSize: "15px", fontWeight: "700", cursor: "pointer",
             boxShadow: "0 4px 20px rgba(221,186,82,0.3)", transition: "all 0.3s",
-            opacity: bookingLoading ? 0.7 : 1,
-          }}>{bookingLoading ? "Envoi..." : bookingDone ? "✅ Demande envoyee avec succes !" : "Reserver ma consultation gratuite"}</button>
+            opacity: loading ? 0.7 : 1,
+          }}>{loading ? "Envoi..." : done ? "✅ Demande envoyee avec succes !" : "Reserver ma consultation gratuite"}</button>
         </form>
       </div>
-    </section>
+    </div>
   );
 }
 
 function Footer() {
   const m = useIsMobile();
   return (
-    <footer style={{ backgroundColor: "#000B2E", color: "white",padding: m ? "50px 20px 24px" : "70px 48px 24px" }}>
+    <footer style={{ backgroundColor: "#000B2E", color: "white", padding: m ? "50px 20px 24px" : "70px 48px 24px" }}>
       <div style={{ maxWidth: "1200px", margin: "0 auto", display: "grid", gridTemplateColumns: m ? "1fr" : "2fr 1fr 1fr 1fr", gap: m ? "32px" : "40px", marginBottom: m ? "32px" : "50px" }}>
         <div>
           <div style={{ display: "flex", alignItems: "center", gap: "12px", marginBottom: "16px" }}>
@@ -646,17 +768,19 @@ function Footer() {
 }
 
 export default function HomePage() {
+  const [rdvOpen, setRdvOpen] = useState(false);
   return (
     <div style={{ fontFamily: "'Poppins', sans-serif" }}>
       <TopBar />
-      <Navbar />
-      <HeroSlider />
+      <Navbar onOpenRdv={() => setRdvOpen(true)} />
+      <HeroSlider onOpenRdv={() => setRdvOpen(true)} />
       <StatsSection />
       <AboutSection />
       <DestinationsSection />
-      <BookingSection />
+      <ContactSection />
       <Footer />
       <FloatingLogo />
+      <RdvModal open={rdvOpen} onClose={() => setRdvOpen(false)} />
     </div>
   );
 }

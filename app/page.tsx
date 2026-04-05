@@ -3,17 +3,29 @@
 import Link from "next/link";
 import Image from "next/image";
 import { useState, useEffect } from "react";
-
+function useIsMobile() {
+  const [mobile, setMobile] = useState(false);
+  useEffect(() => {
+    const check = () => setMobile(window.innerWidth < 769);
+    check();
+    window.addEventListener("resize", check);
+    return () => window.removeEventListener("resize", check);
+  }, []);
+  return mobile;
+}
 function TopBar() {
+const m = useIsMobile();
   return (
     <div style={{
       backgroundColor: "#000B2E",
-      padding: "8px 48px",
+      padding: m ? "8px 16px" : "8px 48px",
       display: "flex",
-      justifyContent: "space-between",
+      justifyContent: m ? "center" : "space-between",
       alignItems: "center",
       borderBottom: "1px solid rgba(221,186,82,0.1)",
-      fontSize: "13px",
+      flexWrap: m ? "wrap" : "nowrap",
+      gap: m ? "6px" : "0",
+      fontSize: m ? "11px" : "13px",
     }}>
       <div style={{ display: "flex", gap: "24px", alignItems: "center" }}>
         <span style={{ color: "rgba(255,255,255,0.6)" }}>✉ Contact@asasforeducation.com</span>
@@ -38,6 +50,8 @@ function TopBar() {
 
 function Navbar() {
   const [scrolled, setScrolled] = useState(false);
+  const [menuOpen, setMenuOpen] = useState(false);
+  const m = useIsMobile();
 
   useEffect(() => {
     const handleScroll = () => setScrolled(window.scrollY > 80);
@@ -45,11 +59,21 @@ function Navbar() {
     return () => window.removeEventListener("scroll", handleScroll);
   }, []);
 
+  useEffect(() => { if (!m) setMenuOpen(false); }, [m]);
+
+  const navLinks = [
+    { label: "Programmes", href: "/programmes" },
+    { label: "Destinations", href: "/destinations" },
+    { label: "Universites", href: "/universites" },
+    { label: "Blog", href: "/blog" },
+    { label: "Contact", href: "/contact" },
+  ];
+
   return (
     <nav style={{
       position: scrolled ? "fixed" : "relative",
       top: 0, left: 0, right: 0, zIndex: 1000,
-      padding: "8px 48px",
+      padding: m ? "8px 16px" : "8px 48px",
       display: "flex",
       justifyContent: "space-between",
       alignItems: "center",
@@ -59,39 +83,66 @@ function Navbar() {
       boxShadow: scrolled ? "0 2px 20px rgba(0,0,0,0.15)" : "0 1px 0 rgba(0,0,0,0.05)",
     }}>
       <Link href="/" style={{ textDecoration: "none", display: "flex", alignItems: "center" }}>
-        <Image src="/images/logo.png" alt="ASAS For Education" width={90} height={90} style={{ objectFit: "contain" }} />
+        <Image src="/images/logo.png" alt="ASAS For Education" width={m ? 60 : 90} height={m ? 60 : 90} style={{ objectFit: "contain" }} />
       </Link>
 
-      <div style={{ display: "flex", alignItems: "center", gap: "32px" }}>
-        {[
-          { label: "Programmes", href: "/programmes" },
-          { label: "Destinations", href: "/destinations" },
-          { label: "Universites", href: "/universites" },
-          { label: "Blog", href: "/blog" },
-          { label: "Contact", href: "/contact" },
-        ].map((item) => (
-          <Link key={item.label} href={item.href} style={{
-            color: scrolled ? "rgba(255,255,255,0.85)" : "#001459",
-            textDecoration: "none", fontSize: "14px", fontWeight: "600", transition: "color 0.3s",
+      {!m && (
+        <div style={{ display: "flex", alignItems: "center", gap: "32px" }}>
+          {navLinks.map((item) => (
+            <Link key={item.label} href={item.href} style={{
+              color: scrolled ? "rgba(255,255,255,0.85)" : "#001459",
+              textDecoration: "none", fontSize: "14px", fontWeight: "600", transition: "color 0.3s",
+            }}
+              onMouseEnter={(e) => (e.currentTarget.style.color = "#DDBA52")}
+              onMouseLeave={(e) => (e.currentTarget.style.color = scrolled ? "rgba(255,255,255,0.85)" : "#001459")}
+            >{item.label}</Link>
+          ))}
+          <Link href="#booking" style={{
+            background: "linear-gradient(135deg, #DDBA52, #C4A243)",
+            color: "#001459", padding: "12px 28px", borderRadius: "50px",
+            textDecoration: "none", fontSize: "14px", fontWeight: "700",
+            boxShadow: "0 4px 15px rgba(221,186,82,0.3)", transition: "transform 0.3s",
           }}
-            onMouseEnter={(e) => (e.currentTarget.style.color = "#DDBA52")}
-            onMouseLeave={(e) => (e.currentTarget.style.color = scrolled ? "rgba(255,255,255,0.85)" : "#001459")}
-          >{item.label}</Link>
-        ))}
-        <Link href="#booking" style={{
-          background: "linear-gradient(135deg, #DDBA52, #C4A243)",
-          color: "#001459", padding: "12px 28px", borderRadius: "50px",
-          textDecoration: "none", fontSize: "14px", fontWeight: "700",
-          boxShadow: "0 4px 15px rgba(221,186,82,0.3)", transition: "transform 0.3s",
-        }}
-          onMouseEnter={(e) => (e.currentTarget.style.transform = "translateY(-2px)")}
-          onMouseLeave={(e) => (e.currentTarget.style.transform = "translateY(0)")}
-        >Prenez un RDV</Link>
-      </div>
+            onMouseEnter={(e) => (e.currentTarget.style.transform = "translateY(-2px)")}
+            onMouseLeave={(e) => (e.currentTarget.style.transform = "translateY(0)")}
+          >Prenez un RDV</Link>
+        </div>
+      )}
+
+      {m && (
+        <button onClick={() => setMenuOpen(!menuOpen)} style={{
+          background: "none", border: "none", cursor: "pointer",
+          display: "flex", flexDirection: "column", gap: "5px", padding: "8px", zIndex: 1001,
+        }}>
+          <span style={{ width: "24px", height: "3px", backgroundColor: scrolled ? "white" : "#001459", borderRadius: "2px", transition: "all 0.3s", transform: menuOpen ? "rotate(45deg) translate(5px, 5px)" : "none" }} />
+          <span style={{ width: "24px", height: "3px", backgroundColor: scrolled ? "white" : "#001459", borderRadius: "2px", transition: "all 0.3s", opacity: menuOpen ? 0 : 1 }} />
+          <span style={{ width: "24px", height: "3px", backgroundColor: scrolled ? "white" : "#001459", borderRadius: "2px", transition: "all 0.3s", transform: menuOpen ? "rotate(-45deg) translate(5px, -5px)" : "none" }} />
+        </button>
+      )}
+
+      {m && menuOpen && (
+        <div style={{
+          position: "absolute", top: "100%", left: 0, right: 0,
+          backgroundColor: "white", boxShadow: "0 8px 24px rgba(0,0,0,0.12)",
+          display: "flex", flexDirection: "column", padding: "16px 24px", gap: "4px",
+          zIndex: 999,
+        }}>
+          {navLinks.map((l) => (
+            <Link key={l.href} href={l.href} onClick={() => setMenuOpen(false)} style={{
+              color: "#001459", textDecoration: "none", fontSize: "15px", fontWeight: "600",
+              padding: "12px 0", borderBottom: "1px solid #f0f0f0",
+            }}>{l.label}</Link>
+          ))}
+          <Link href="#booking" onClick={() => setMenuOpen(false)} style={{
+            backgroundColor: "#DDBA52", color: "#001459", padding: "12px 20px",
+            borderRadius: "8px", textDecoration: "none", fontSize: "15px", fontWeight: "bold",
+            textAlign: "center", marginTop: "8px",
+          }}>Prenez un RDV</Link>
+        </div>
+      )}
     </nav>
   );
 }
-
 function FloatingLogo() {
   return (
     <div style={{
@@ -122,6 +173,8 @@ function FloatingLogo() {
 function HeroSlider() {
   const [current, setCurrent] = useState(0);
   const [fadeIn, setFadeIn] = useState(true);
+  const m = useIsMobile();
+
 
   const slides = [
     {
@@ -163,7 +216,7 @@ function HeroSlider() {
   };
 
   return (
-    <section style={{ position: "relative", height: "85vh", minHeight: "550px", overflow: "hidden" }}>
+    <section style={{ position: "relative", height: m ? "75vh" : "85vh", minHeight: m ? "500px" : "550px", overflow: "hidden" }}>
       {slides.map((slide, i) => (
         <div key={i} style={{
           position: "absolute", top: 0, left: 0, width: "100%", height: "100%",
@@ -187,10 +240,10 @@ function HeroSlider() {
       <div style={{
         position: "relative", zIndex: 10, height: "100%",
         display: "flex", alignItems: "center",
-        padding: "0 80px", maxWidth: "1400px", margin: "0 auto",
+        padding: m ? "0 20px" : "0 80px", maxWidth: "1400px", margin: "0 auto",
       }}>
         <div style={{
-          maxWidth: "650px",
+          maxWidth: m ? "100%" : "650px",
           opacity: fadeIn ? 1 : 0,
           transform: fadeIn ? "translateX(0)" : "translateX(-30px)",
           transition: "all 0.6s cubic-bezier(0.16, 1, 0.3, 1)",
@@ -210,7 +263,7 @@ function HeroSlider() {
 
           <h1 style={{
             color: "white",
-            fontSize: "clamp(32px, 4.5vw, 56px)",
+            fontSize: m ? "26px" : "clamp(32px, 4.5vw, 56px)",
             fontWeight: "900", lineHeight: "1.1",
             marginBottom: "20px", letterSpacing: "-0.5px",
             textShadow: "0 2px 20px rgba(0,0,0,0.3)",
@@ -220,7 +273,7 @@ function HeroSlider() {
 
           <p style={{
             color: "rgba(255,255,255,0.75)",
-            fontSize: "16px", lineHeight: "1.8",
+            fontSize: m ? "13px" : "16px", lineHeight: "1.8",
             marginBottom: "32px", maxWidth: "520px",
             textShadow: "0 1px 8px rgba(0,0,0,0.2)",
           }}>
@@ -300,6 +353,7 @@ function HeroSlider() {
 }
 
 function StatsSection() {
+  const m = useIsMobile();
   const stats = [
     { number: "3000+", label: "Admissions reussies", icon: "🎓" },
     { number: "7+", label: "Annees d'expertise", icon: "📅" },
@@ -308,8 +362,8 @@ function StatsSection() {
   ];
 
   return (
-    <section style={{ background: "linear-gradient(135deg, #DDBA52, #C4A243)", padding: "50px 48px" }}>
-      <div style={{ maxWidth: "1200px", margin: "0 auto", display: "grid", gridTemplateColumns: "repeat(4, 1fr)", gap: "32px" }}>
+    <section style={{ background: "linear-gradient(135deg, #DDBA52, #C4A243)", padding: m ? "40px 20px" : "50px 48px" }}>
+      <div style={{ maxWidth: "1200px", margin: "0 auto", display: "grid", gridTemplateColumns: m ? "repeat(2, 1fr)" : "repeat(4, 1fr)", gap: m ? "24px" : "32px" }}>
         {stats.map((stat, i) => (
           <div key={i} style={{ textAlign: "center" }}>
             <div style={{ fontSize: "28px", marginBottom: "6px" }}>{stat.icon}</div>
@@ -323,8 +377,9 @@ function StatsSection() {
 }
 
 function AboutSection() {
+  const m = useIsMobile();
   return (
-    <section id="about" style={{ padding: "100px 48px", backgroundColor: "#FAFAFA" }}>
+    <section id="about" style={{ padding: m ? "60px 20px" : "100px 48px", backgroundColor: "#FAFAFA" }}>
       <div style={{ maxWidth: "1200px", margin: "0 auto" }}>
         <div style={{ textAlign: "center", marginBottom: "56px" }}>
           <div style={{ color: "#DDBA52", fontSize: "12px", letterSpacing: "4px", textTransform: "uppercase", marginBottom: "14px", fontWeight: "600" }}>A propos</div>
@@ -336,7 +391,7 @@ function AboutSection() {
             d&apos;etudes internationales en realite. Grace a notre vaste reseau de partenaires prestigieux.
           </p>
         </div>
-        <div style={{ display: "grid", gridTemplateColumns: "repeat(3, 1fr)", gap: "28px" }}>
+        <div style={{ display: "grid", gridTemplateColumns: m ? "1fr" : "repeat(3, 1fr)", gap: m ? "16px" : "28px" }}>
           {[
             { icon: "🎓", title: "Expertise prouvee", desc: "Plus de 3 000 admissions reussies a notre actif, avec un taux de satisfaction exceptionnel.", accent: "#DDBA52" },
             { icon: "🌍", title: "Reseau mondial", desc: "Des partenariats strategiques avec des universites d'elite sur plusieurs continents.", accent: "#001459" },
@@ -370,20 +425,21 @@ function AboutSection() {
 }
 
 function DestinationsSection() {
+  const m = useIsMobile();
   const [destinations, setDestinations] = useState<{id: string; name: string; code: string; universityCount: number}[]>([]);
   useEffect(() => {
     fetch("/api/public/countries").then(r => r.json()).then(data => setDestinations(data)).catch(() => {});
   }, []);
   if (destinations.length === 0) return null;
   return (
-    <section style={{ padding: "100px 48px", background: "linear-gradient(160deg, #001459 0%, #000B2E 100%)" }}>
+    <section style={{ padding: m ? "60px 20px" : "100px 48px", background: "linear-gradient(160deg, #001459 0%, #000B2E 100%)" }}>
       <div style={{ maxWidth: "1200px", margin: "0 auto" }}>
         <div style={{ textAlign: "center", marginBottom: "56px" }}>
           <div style={{ color: "#DDBA52", fontSize: "12px", letterSpacing: "4px", textTransform: "uppercase", marginBottom: "14px", fontWeight: "600" }}>Destinations</div>
           <h2 style={{ color: "white", fontSize: "clamp(26px, 3.5vw, 40px)", fontWeight: "800", marginBottom: "12px" }}>Explorez nos destinations</h2>
           <p style={{ color: "rgba(255,255,255,0.45)", fontSize: "15px" }}>Des opportunites dans les meilleurs pays du monde</p>
         </div>
-        <div style={{ display: "grid", gridTemplateColumns: "repeat(3, 1fr)", gap: "20px" }}>
+        <div style={{ display: "grid", gridTemplateColumns: m ? "1fr" : "repeat(3, 1fr)", gap: m ? "12px" : "20px" }}>
           {destinations.map((dest) => (
             <Link key={dest.id} href={`/universites?pays=${dest.name.toLowerCase()}`} style={{
               background: "rgba(255,255,255,0.04)", border: "1px solid rgba(255,255,255,0.08)",
@@ -407,6 +463,7 @@ function DestinationsSection() {
 }
 
 function BookingSection() {
+  const m = useIsMobile();
   const [formData, setFormData] = useState({
     firstName: "", lastName: "", email: "", phone: "", city: "", level: "", sessionType: "online", preferredDate: "", preferredTime: "",
   });
@@ -440,7 +497,7 @@ function BookingSection() {
   };
 
   return (
-    <section id="booking" style={{ padding: "100px 48px", backgroundColor: "white" }}>
+    <section id="booking" style={{ padding: m ? "60px 16px" : "100px 48px", backgroundColor: "white" }}>
       <div style={{ maxWidth: "640px", margin: "0 auto" }}>
         <div style={{ textAlign: "center", marginBottom: "40px" }}>
           <div style={{ color: "#DDBA52", fontSize: "12px", letterSpacing: "4px", textTransform: "uppercase", marginBottom: "14px", fontWeight: "600" }}>Consultation gratuite</div>
@@ -450,10 +507,10 @@ function BookingSection() {
           <p style={{ color: "#888", fontSize: "14px" }}>30 minutes de consultation individuelle — en ligne ou dans nos bureaux</p>
         </div>
         <form onSubmit={handleBookingSubmit} style={{
-          backgroundColor: "white", padding: "36px", borderRadius: "16px",
+          backgroundColor: "white", padding: m ? "24px 16px" : "36px", borderRadius: "16px",
           boxShadow: "0 8px 40px rgba(0,0,0,0.06)", border: "1px solid #F0F0F0",
         }}>
-          <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "14px", marginBottom: "14px" }}>
+          <div style={{ display: "grid", gridTemplateColumns: m ? "1fr" : "1fr 1fr", gap: "14px", marginBottom: "14px" }}>
             <div>
               <label style={{ display: "block", marginBottom: "5px", fontSize: "13px", color: "#444", fontWeight: "600" }}>Nom *</label>
               <input type="text" required style={inputStyle} placeholder="Votre nom" value={formData.lastName} onChange={(e) => handleChange("lastName", e.target.value)} />
@@ -471,7 +528,7 @@ function BookingSection() {
             <label style={{ display: "block", marginBottom: "5px", fontSize: "13px", color: "#444", fontWeight: "600" }}>Telephone *</label>
             <input type="tel" required style={inputStyle} placeholder="+212 6XX XXX XXX" value={formData.phone} onChange={(e) => handleChange("phone", e.target.value)} />
           </div>
-          <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "14px", marginBottom: "14px" }}>
+          <div style={{ display: "grid", gridTemplateColumns: m ? "1fr" : "1fr 1fr", gap: "14px", marginBottom: "14px" }}>
             <div>
               <label style={{ display: "block", marginBottom: "5px", fontSize: "13px", color: "#444", fontWeight: "600" }}>Ville *</label>
               <input type="text" required style={inputStyle} placeholder="Votre ville" value={formData.city} onChange={(e) => handleChange("city", e.target.value)} />
@@ -487,7 +544,7 @@ function BookingSection() {
               </select>
             </div>
           </div>
-          <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "14px", marginBottom: "14px" }}>
+          <div style={{ display: "grid", gridTemplateColumns: m ? "1fr" : "1fr 1fr", gap: "14px", marginBottom: "14px" }}>
             <div>
               <label style={{ display: "block", marginBottom: "5px", fontSize: "13px", color: "#444", fontWeight: "600" }}>Date souhaitee *</label>
               <input type="date" required style={inputStyle} value={formData.preferredDate} onChange={(e) => handleChange("preferredDate", e.target.value)} />
@@ -527,9 +584,10 @@ function BookingSection() {
 }
 
 function Footer() {
+  const m = useIsMobile();
   return (
-    <footer style={{ backgroundColor: "#000B2E", color: "white", padding: "70px 48px 24px" }}>
-      <div style={{ maxWidth: "1200px", margin: "0 auto", display: "grid", gridTemplateColumns: "2fr 1fr 1fr 1fr", gap: "40px", marginBottom: "50px" }}>
+    <footer style={{ backgroundColor: "#000B2E", color: "white",padding: m ? "50px 20px 24px" : "70px 48px 24px" }}>
+      <div style={{ maxWidth: "1200px", margin: "0 auto", display: "grid", gridTemplateColumns: m ? "1fr" : "2fr 1fr 1fr 1fr", gap: m ? "32px" : "40px", marginBottom: m ? "32px" : "50px" }}>
         <div>
           <div style={{ display: "flex", alignItems: "center", gap: "12px", marginBottom: "16px" }}>
             <Image src="/images/logo.png" alt="ASAS" width={50} height={50} style={{ objectFit: "contain" }} />

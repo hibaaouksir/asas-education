@@ -83,7 +83,7 @@ function Navbar({ onOpenRdv }: { onOpenRdv: () => void }) {
       boxShadow: scrolled ? "0 2px 20px rgba(0,0,0,0.15)" : "0 1px 0 rgba(0,0,0,0.05)",
     }}>
       <Link href="/" style={{ textDecoration: "none", display: "flex", alignItems: "center" }}>
-        <Image src="/images/logo.png" alt="ASAS For Education" width={m ? 60 : 90} height={m ? 60 : 90} style={{ objectFit: "contain" }} />
+        <Image src="/asas-logo.svg" alt="ASAS For Education" width={m ? 60 : 90} height={m ? 60 : 90} style={{ objectFit: "contain" }} />
       </Link>
 
       {!m && (
@@ -166,7 +166,7 @@ function FloatingLogo() {
       onMouseEnter={(e) => { e.currentTarget.style.transform = "scale(1.1)"; e.currentTarget.style.boxShadow = "0 6px 25px rgba(221,186,82,0.3)"; }}
       onMouseLeave={(e) => { e.currentTarget.style.transform = "scale(1)"; e.currentTarget.style.boxShadow = "0 4px 20px rgba(0,0,0,0.15)"; }}
     >
-      <Image src="/images/logo.png" alt="ASAS" width={45} height={45} style={{ objectFit: "contain" }} />
+      <Image src="/asas-logo.svg" alt="ASAS" width={45} height={45} style={{ objectFit: "contain" }} />
     </div>
   );
 }
@@ -712,7 +712,7 @@ function Footer() {
       <div style={{ maxWidth: "1200px", margin: "0 auto", display: "grid", gridTemplateColumns: m ? "1fr" : "2fr 1fr 1fr 1fr", gap: m ? "32px" : "40px", marginBottom: m ? "32px" : "50px" }}>
         <div>
           <div style={{ display: "flex", alignItems: "center", gap: "12px", marginBottom: "16px" }}>
-            <Image src="/images/logo.png" alt="ASAS" width={50} height={50} style={{ objectFit: "contain" }} />
+            <Image src="/asas-logo.svg" alt="ASAS" width={50} height={50} style={{ objectFit: "contain" }} />
             <span style={{ color: "#DDBA52", fontSize: "15px", fontWeight: "700", letterSpacing: "1.5px" }}>ASAS FOR EDUCATION</span>
           </div>
           <p style={{ color: "rgba(255,255,255,0.35)", fontSize: "13px", lineHeight: "1.8", maxWidth: "280px" }}>

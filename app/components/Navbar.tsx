@@ -36,7 +36,7 @@ export default function Navbar() {
       boxShadow: "0 2px 8px rgba(0,0,0,0.06)",
     }}>
       <Link href="/" style={{ textDecoration: "none", display: "flex", alignItems: "center", gap: "10px" }}>
-        <img src="/images/logo.png" alt="ASAS" style={{ height: "50px", objectFit: "contain" }} />
+        <img src="/asas-logo.svg" alt="ASAS" style={{ height: "50px", objectFit: "contain" }} />
       </Link>
 
       {/* Desktop menu */}
